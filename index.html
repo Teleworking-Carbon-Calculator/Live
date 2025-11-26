@@ -16,6 +16,7 @@
       margin-top: 0;
     }
     .card {
+	
       background: #fff;
       border-radius: 12px;
       padding: 1rem 1.3rem;
@@ -400,15 +401,15 @@
     ];
 
     const HEATING_DATA = [
-      { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 635, 	"Heating the rest of property (kWh/year/person)": 1610 },
-	  { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 710, 	"Heating the rest of property (kWh/year/person)": 1810 },
-	  { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 785, 	"Heating the rest of property (kWh/year/person)": 2010 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 840, 	"Heating the rest of property (kWh/year/person)": 2140 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 935, 	"Heating the rest of property (kWh/year/person)": 2400 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1030, 	"Heating the rest of property (kWh/year/person)": 2660 },
-	  { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1040, 	"Heating the rest of property (kWh/year/person)": 2700 },
-      { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1155, 	"Heating the rest of property (kWh/year/person)": 2975 },
-	  { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1270, 	"Heating the rest of property (kWh/year/person)": 3290 }
+      { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749, 	"Heating the rest of property (kWh/year/person)": 1897 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837, 	"Heating the rest of property (kWh/year/person)": 2130 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925, 	"Heating the rest of property (kWh/year/person)": 2368 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989, 	"Heating the rest of property (kWh/year/person)": 2525 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, 	"Heating the rest of property (kWh/year/person)": 2827 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, 	"Heating the rest of property (kWh/year/person)": 3134 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, 	"Heating the rest of property (kWh/year/person)": 3138 },
+      { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, 	"Heating the rest of property (kWh/year/person)": 3506 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, 	"Heating the rest of property (kWh/year/person)": 3880 }
     ];
 
 	const ELECTRICAL_DATA = [
@@ -649,8 +650,8 @@
 		  <input type="number" data-type="e-hours" min="0" step="0.5" value="8">
 		</div>
 		<div>
-		  <label>Days per year</label>
-		  <input type="number" data-type="e-days" min="0" step="1" value="220">
+		  <label>Months per year</label>
+		  <input type="number" data-type="e-months" min="0" max="12" step="1" value="220">
 		</div>
 		<div style="display:flex; align-items:flex-end;">
 		  <button type="button" class="remove-row-btn" style="
@@ -728,6 +729,32 @@
         transportKg = +(tDist * tfactor * annualdays *0.67).toFixed(4);				//Calculates annual transport emissions based on distance, factor total commute days per year and 0.67 SCALING FACTOR FOR REBOUNB EFFECTS -->
       }
 
+	
+    //ELECTRICAL
+	  const bRenewable =document.getElementById("b_renewable").checked;
+      const eContainers = document.querySelectorAll("#electrical-rows > .grid");
+      let totalKwh = 17*bdays/5;													//Acounts for base lighting usage
+      eContainers.forEach((wrap, idx) => {
+        const itemSel = wrap.querySelector('[data-type="e-item"]');
+        const hoursInput = wrap.querySelector('[data-type="e-hours"]');
+        const monthsInput = wrap.querySelector('[data-type="e-months"]');
+        if (!itemSel || !hoursInput || !monthsInput) return;
+        const item = itemSel.value.toLowerCase();
+        const hours = Number(hoursInput.value || 0);
+        const days = (Number(monthsInput.value || 0))*220/12;
+        const watt = ELECTRICAL_WATTS[item] || 0;
+        const kwh = (watt * hours * days) / 1000.0;
+        totalKwh += kwh;
+      });
+	  
+      let gridFactor = GRID_CO2E_PER_KWH;
+	  
+	  if (bRenewable) {
+	    gridFactor = 0.0167 - GRID_CO2E_PER_KWH
+		};
+		
+      const electricalKg = +(totalKwh * gridFactor).toFixed(4);
+
     //HEATING
       const hExtra = Number(document.getElementById("h_extra_hours").value || 0);
       const hTemp = Number(document.getElementById("h_temp").value || 0);
@@ -760,35 +787,15 @@
 		  heatingKwh = 0
 		}
 		
-        const fuelFactor = getFuelFactor(hFuel); // kg CO2e per kWh
+        let fuelFactor = getFuelFactor(hFuel); // kg CO2e per kWh
+		
+		if ((bRenewable) && (hFuel === "Electric Radiator")) {
+	    fuelFactor = 0.0167 
+		};
+		
         heatingKg = +(heatingKwh * fuelFactor).toFixed(4);
       }
     }
-	
-    //ELECTRICAL
-	  const bRenewable =document.getElementById("b_renewable").checked;
-      const eContainers = document.querySelectorAll("#electrical-rows > .grid");
-      let totalKwh = 0;
-      eContainers.forEach((wrap, idx) => {
-        const itemSel = wrap.querySelector('[data-type="e-item"]');
-        const hoursInput = wrap.querySelector('[data-type="e-hours"]');
-        const daysInput = wrap.querySelector('[data-type="e-days"]');
-        if (!itemSel || !hoursInput || !daysInput) return;
-        const item = itemSel.value.toLowerCase();
-        const hours = Number(hoursInput.value || 0);
-        const days = Number(daysInput.value || 0);
-        const watt = ELECTRICAL_WATTS[item] || 0;
-        const kwh = (watt * hours * days) / 1000.0;
-        totalKwh += kwh;
-      });
-	  
-      let gridFactor = GRID_CO2E_PER_KWH;
-	  
-	  if (bRenewable) {
-	    gridFactor = 0.0167 - GRID_CO2E_PER_KWH
-		};
-		
-      const electricalKg = +(totalKwh * gridFactor).toFixed(4);
 
     //EMBEDDED
       const emContainers = document.querySelectorAll("#embedded-rows > .grid");
