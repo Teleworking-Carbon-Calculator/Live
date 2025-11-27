@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <title>Telework Carbon Calculator (Browser Only)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    Core styles for layout, typography, cards, grids, and results display.
+    Only whitespace/formatting changed from original – no functional changes.
+  -->
   <style>
+    /* --- Base layout & typography --- */
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
       margin: 0;
@@ -12,29 +18,34 @@
       background: #f5f7fb;
       color: #222;
     }
-    h1, h2 {
+
+    h1,
+    h2 {
       margin-top: 0;
     }
+
+    /* --- Standard card container --- */
     .card {
-	
       background: #fff;
       border-radius: 12px;
       padding: 1rem 1.3rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
-	    
-	.card-row {
+
+    /* --- Row of cards (e.g. electrical + embedded side-by-side) --- */
+    .card-row {
       display: flex;
       gap: 1rem;
       align-items: flex-start;
-      flex-wrap: wrap;        /* stacks nicely on small screens */
+      flex-wrap: wrap; /* stacks nicely on small screens */
     }
 
     .card-row .card {
-      flex: 1 1 320px;        /* each card shares the row */
+      flex: 1 1 320px; /* each card shares the row */
     }
 
+    /* --- Simple vertical stack helper --- */
     .vstack-row {
       display: flex;
       flex-direction: column;
@@ -42,33 +53,41 @@
       margin-bottom: 0.75rem;
     }
 
+    /* --- Responsive grid for form controls --- */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
     }
-	
+
+    /* --- Form controls --- */
     label {
       display: block;
       margin-bottom: 0.25rem;
       font-weight: 600;
       font-size: 0.9rem;
     }
-    input, select {
+
+    input,
+    select {
       width: 100%;
       padding: 0.4rem 0.5rem;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 0.9rem;
     }
+
     input[type="number"] {
       -moz-appearance: textfield;
     }
+
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
+    /* --- Primary button style --- */
     button {
       padding: 0.6rem 1.2rem;
       border-radius: 999px;
@@ -79,9 +98,12 @@
       cursor: pointer;
       margin-top: 0.5rem;
     }
+
     button:hover {
       background: #1d4ed8;
     }
+
+    /* --- Raw results preformatted block (used by the styled widget) --- */
     .results {
       font-family: "Consolas", "SF Mono", monospace;
       font-size: 0.9rem;
@@ -92,9 +114,13 @@
       border-radius: 10px;
       overflow-x: auto;
     }
-    .muted { color: #6b7280; font-size: 0.85rem; 
-	}
-	
+
+    .muted {
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+
+    /* --- Styled "pro" results widget --- */
     .results-pro {
       background: #020617;
       color: #e5e7eb;
@@ -200,71 +226,75 @@
       margin-left: 0.5rem;
     }
 
-	
-	select:disabled {
-	  background: #e5e7eb;
-	  color: #6b7280;
-	cursor: not-allowed;
-	}
-	
-	.remove-row-btn {
-	  background: #dc2626;
-	  color: white;
-	  border: none;
-	  padding: 6px 12px;
-	  font-size: 0.85rem;
-	  border-radius: 8px;
-	  cursor: pointer;
-	}
+    /* --- Disabled select state (used for transport/heating logic) --- */
+    select:disabled {
+      background: #e5e7eb;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
 
-	.remove-row-btn:hover {
-	  background: #b91c1c;
-	}
+    /* --- Small remove-row button for dynamic rows --- */
+    .remove-row-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-
+    .remove-row-btn:hover {
+      background: #b91c1c;
+    }
   </style>
 </head>
+
 <body>
   <h1>Telework Carbon Calculator (Client-side)</h1>
   <p class="muted">
-
+    <!-- Optional intro text can go here -->
   </p>
-  <!-- Behaviour -->
+
+  <!-- =========================================================
+       SECTION 0: Behaviour (global teleworking assumptions)
+       ========================================================= -->
   <div class="card">
     <h2>Behaviour</h2>
     <div class="grid">
-    <div>
-      <label for="b_days">Days teleworking per week</label>
-      <select id="b_days">
-        <option value="1">1 day</option>
-        <option value="2">2 days</option>
-        <option value="3">3 days</option>
-        <option value="4">4 days</option>
-        <option value="5">5 days</option>
-      </select>
-    </div>
+      <div>
+        <label for="b_days">Days teleworking per week</label>
+        <select id="b_days">
+          <option value="1">1 day</option>
+          <option value="2">2 days</option>
+          <option value="3">3 days</option>
+          <option value="4">4 days</option>
+          <option value="5">5 days</option>
+        </select>
+      </div>
 
-    <div>
-      <label>
-        I have a renewable electricity supplier
-        <input type="checkbox" id="b_renewable" />
-      </label>
-      <p class="muted" style="margin:0.3rem 0 0 0;">
-        Tick if your home electricity comes from 100% renewable supply
-      </p>
-    </div>
+      <div>
+        <label>
+          I have a renewable electricity supplier
+          <input type="checkbox" id="b_renewable" />
+        </label>
+        <p class="muted" style="margin: 0.3rem 0 0 0;">
+          Tick if your home electricity comes from 100% renewable supply
+        </p>
+      </div>
 
-    <div>
-      <label>
-        I do not intend to telework in winter months
-        <input type="checkbox" id="b_winter" />
-      </label>
-      </p>
+      <div>
+        <label>
+          I do not intend to telework in winter months
+          <input type="checkbox" id="b_winter" />
+        </label>
+      </div>
     </div>
-
   </div>
-</div>
-  <!-- TRANSPORT -->
+
+  <!-- =========================================================
+       SECTION 1: Transport
+       ========================================================= -->
   <div class="card">
     <h2>1. Transport</h2>
 
@@ -272,58 +302,67 @@
       <div>
         <label for="t_mode">Mode</label>
         <select id="t_mode"></select>
-		<p class="muted" style="margin:0.3rem 0 0 0;">
-		If you take multiple forms of transport to work please select your most common form
-		</p>
+        <p class="muted" style="margin: 0.3rem 0 0 0;">
+          If you take multiple forms of transport to work please select your most common form
+        </p>
       </div>
+
       <div>
         <label for="t_size">Vehicle size</label>
         <select id="t_size"></select>
       </div>
+
       <div>
         <label for="t_fuel">Fuel type</label>
         <select id="t_fuel"></select>
       </div>
+
       <div>
         <label for="t_distance">Distance (miles)</label>
         <input type="number" id="t_distance" min="0" step="0.1" value="20" />
-		<p class="muted" style="margin:0.3rem 0 0 0;">
-		Please describe the core commute to work, not including diversions for shopping or childcare etc...
-		</p>
+        <p class="muted" style="margin: 0.3rem 0 0 0;">
+          Please describe the core commute to work, not including diversions for shopping or childcare etc...
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- HEATING -->
+  <!-- =========================================================
+       SECTION 2: Heating
+       ========================================================= -->
   <div class="card">
     <h2>2. Heating</h2>
     <div class="grid">
-	   <div>
+      <div>
         <label>
-		  The property is otherwise occupied during the day
-		  <input type="checkbox" id="h_Occupied" checked />
-		</label>
-		<p class="muted" style="margin:0.3rem 0 0 0;">
+          The property is otherwise occupied during the day
+          <input type="checkbox" id="h_Occupied" checked />
+        </label>
+        <p class="muted" style="margin: 0.3rem 0 0 0;">
           Tick if someone else is at home during work hours
         </p>
       </div>
-	  <div>
+
+      <div>
         <label>
-		  I heat the entire property
+          I heat the entire property
           <input type="checkbox" id="h_include_rest" checked />
         </label>
-		<p class="muted" style="margin:0.3rem 0 0 0;">
+        <p class="muted" style="margin: 0.3rem 0 0 0;">
           Tick if you heat the entire property, rather than just your home office whilst working
         </p>
       </div>
+
       <div>
         <label for="h_extra_hours">Extra heating hours/day</label>
         <select id="h_extra_hours"></select>
       </div>
+
       <div>
         <label for="h_temp">Heating temperature (°C)</label>
         <select id="h_temp"></select>
       </div>
+
       <div>
         <label for="h_fuel">Heating fuel</label>
         <select id="h_fuel"></select>
@@ -331,9 +370,11 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       SECTION 3 & 4: Electrical (use) + Embedded (equipment)
+       ========================================================= -->
   <div class="card-row">
-
-    <!-- ELECTRICAL -->
+    <!-- 3. Electrical equipment (use phase) -->
     <div class="card">
       <h2>3. Electrical equipment (use phase)</h2>
       <p class="muted">Add rows for devices below, then click "Calculate".</p>
@@ -343,7 +384,7 @@
       <button type="button" id="add-electrical-row">+ Add device</button>
     </div>
 
-    <!-- EMBEDDED -->
+    <!-- 4. Embedded equipment footprint -->
     <div class="card">
       <h2>4. Embedded equipment footprint</h2>
       <p class="muted">What additional equipment would you require to set up your secondary workstation</p>
@@ -352,10 +393,11 @@
       </div>
       <button type="button" id="add-embedded-row">+ Add equipment</button>
     </div>
-
   </div>
 
-  <!-- CALCULATE -->
+  <!-- =========================================================
+       SECTION 5: Calculation & Results
+       ========================================================= -->
   <div class="card">
     <button type="button" id="btn-calc">Calculate carbon impact</button>
     <div style="margin-top: 0.75rem;">
@@ -363,167 +405,190 @@
     </div>
   </div>
 
-  <!-- DEBUG BANNER -->
-  <div id="debug-banner"
-     onclick="this.style.display='none'"
-     style="position:fixed; bottom:0; left:0; right:0;
-            background:#444; color:#fff; padding:6px 12px;
-            font-family:monospace; font-size:13px;
-            z-index:99999; opacity:0.85;">
-  </div>
-  <!-- DATA -->
+  <!-- =========================================================
+       DEBUG BANNER (persistent at bottom of viewport)
+       ========================================================= -->
+  <div
+    id="debug-banner"
+    onclick="this.style.display='none'"
+    style="
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #444;
+      color: #fff;
+      padding: 6px 12px;
+      font-family: monospace;
+      font-size: 13px;
+      z-index: 99999;
+      opacity: 0.85;
+    "
+  ></div>
+
+  <!-- =========================================================
+       SCRIPT BLOCK 1: Static data tables (transport, fuel, etc.)
+       ========================================================= -->
   <script>
     const TRANSPORT_DATA = [
-      { "Mode": "Car", 				"Size": "Small",  	"Diesel": 0.22522, 	"Petrol": 0.23126, 	"Hybrid": 0.18143, 	"PluginHybrid": 0.09782, 	"BatteryElectric": 0.06894, "Standard": null 		},
-      { "Mode": "Car", 				"Size": "Medium", 	"Diesel": 0.2705, 	"Petrol": 0.28526, 	"Hybrid": 0.18492, 	"PluginHybrid": 0.14983, 	"BatteryElectric": 0.07442, "Standard": null 		},
-	  { "Mode": "Car", 				"Size": "Large", 	"Diesel": 0.33362, 	"Petrol": 0.43267, 	"Hybrid": 0.24921, 	"PluginHybrid": 0.19191, 	"BatteryElectric": 0.07925, "Standard": null 		},
-	  { "Mode": "Car", 				"Size": "Average", 	"Diesel": 0.27334, 	"Petrol": 0.26473, 	"Hybrid": 0.20288, 	"PluginHybrid": 0.17465, 	"BatteryElectric": 0.07635, "Standard": null 		},
-	  { "Mode": "Motorbike", 		"Size": "Small", 	"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null,	"Standard": 0.13389 	},
-	  { "Mode": "Motorbike", 		"Size": "Medium", 	"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.16265 	},
-	  { "Mode": "Motorbike", 		"Size": "Large", 	"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.21326 	},
-	  { "Mode": "Motorbike", 		"Size": "Average", 	"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.18293 	},
-	  { "Mode": "Electric Bicycle", "Size": null, 		"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.0040225 	},
-	  { "Mode": "Bicycle", 			"Size": null, 		"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.0 		},
-      { "Mode": "Bus", 				"Size": null, 		"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.17467304 	},
-	  { "Mode": "Rail", 			"Size": null, 		"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.05705514 	},
-	  { "Mode": "Walking", 			"Size": null, 		"Diesel": null, 	"Petrol": null, 	"Hybrid": null, 	"PluginHybrid": null, 		"BatteryElectric": null, 	"Standard": 0.0 		}
+      { "Mode": "Car", "Size": "Small", "Diesel": 0.22522, "Petrol": 0.23126, "Hybrid": 0.18143, "PluginHybrid": 0.09782, "BatteryElectric": 0.06894, "Standard": null },
+      { "Mode": "Car", "Size": "Medium", "Diesel": 0.2705, "Petrol": 0.28526, "Hybrid": 0.18492, "PluginHybrid": 0.14983, "BatteryElectric": 0.07442, "Standard": null },
+      { "Mode": "Car", "Size": "Large", "Diesel": 0.33362, "Petrol": 0.43267, "Hybrid": 0.24921, "PluginHybrid": 0.19191, "BatteryElectric": 0.07925, "Standard": null },
+      { "Mode": "Car", "Size": "Average", "Diesel": 0.27334, "Petrol": 0.26473, "Hybrid": 0.20288, "PluginHybrid": 0.17465, "BatteryElectric": 0.07635, "Standard": null },
+      { "Mode": "Motorbike", "Size": "Small", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.13389 },
+      { "Mode": "Motorbike", "Size": "Medium", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.16265 },
+      { "Mode": "Motorbike", "Size": "Large", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.21326 },
+      { "Mode": "Motorbike", "Size": "Average", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.18293 },
+      { "Mode": "Electric Bicycle", "Size": null, "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.0040225 },
+      { "Mode": "Bicycle", "Size": null, "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.0 },
+      { "Mode": "Bus", "Size": null, "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.17467304 },
+      { "Mode": "Rail", "Size": null, "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.05705514 },
+      { "Mode": "Walking", "Size": null, "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.0 }
     ];
 
     const FUEL_DATA = [
-      { "Fuel": "Unknown (Average)",	"CO2e/kwh": 0.20835054 				},
-      { "Fuel": "Wood",					"CO2e/kwh": 0.01132 				},
-	  { "Fuel": "Gas",					"CO2e/kwh": 0.20440 				},
-	  { "Fuel": "LPG",					"CO2e/kwh": 0.23031 				},
-	  { "Fuel": "Oil",					"CO2e/kwh": 0.25975 				},
-	  { "Fuel": "Coal",					"CO2e/kwh": 0.36549 				},		
-	  { "Fuel": "Electric Radiator",	"CO2e/kwh": 0.22535 				},
-	  { "Fuel": "Electric Heat Pump",	"CO2e/kwh": 0.0 					}
+      { "Fuel": "Unknown (Average)", "CO2e/kwh": 0.20835054 },
+      { "Fuel": "Wood", "CO2e/kwh": 0.01132 },
+      { "Fuel": "Gas", "CO2e/kwh": 0.20440 },
+      { "Fuel": "LPG", "CO2e/kwh": 0.23031 },
+      { "Fuel": "Oil", "CO2e/kwh": 0.25975 },
+      { "Fuel": "Coal", "CO2e/kwh": 0.36549 },
+      { "Fuel": "Electric Radiator", "CO2e/kwh": 0.22535 },
+      { "Fuel": "Electric Heat Pump", "CO2e/kwh": 0.0 }
     ];
 
     const HEATING_DATA = [
-      { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749, 	"Heating the rest of property (kWh/year/person)": 1897 },
-	  { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837, 	"Heating the rest of property (kWh/year/person)": 2130 },
-	  { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925, 	"Heating the rest of property (kWh/year/person)": 2368 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989, 	"Heating the rest of property (kWh/year/person)": 2525 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, 	"Heating the rest of property (kWh/year/person)": 2827 },
-	  { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, 	"Heating the rest of property (kWh/year/person)": 3134 },
-	  { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, 	"Heating the rest of property (kWh/year/person)": 3138 },
-      { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, 	"Heating the rest of property (kWh/year/person)": 3506 },
-	  { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, 	"Heating the rest of property (kWh/year/person)": 3880 }
+      { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749, "Heating the rest of property (kWh/year/person)": 1897 },
+      { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837, "Heating the rest of property (kWh/year/person)": 2130 },
+      { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925, "Heating the rest of property (kWh/year/person)": 2368 },
+      { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989, "Heating the rest of property (kWh/year/person)": 2525 },
+      { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, "Heating the rest of property (kWh/year/person)": 2827 },
+      { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, "Heating the rest of property (kWh/year/person)": 3134 },
+      { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, "Heating the rest of property (kWh/year/person)": 3138 },
+      { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, "Heating the rest of property (kWh/year/person)": 3506 },
+      { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, "Heating the rest of property (kWh/year/person)": 3880 }
     ];
 
-	const ELECTRICAL_DATA = [
-	  { "Item": "Laptop",        "Wattage": 140 	},
-	  { "Item": "Desktop",       "Wattage": 200 	},
-	  { "Item": "Monitor",       "Wattage": 33  	},
-	  { "Item": "Desk Fan",      "Wattage": 33  	},
-	  { "Item": "Portable Heater","Wattage": 1500 	},
-	  { "Item": "Desk Lamp",     "Wattage": 40  	}
-	];
+    const ELECTRICAL_DATA = [
+      { "Item": "Laptop", "Wattage": 140 },
+      { "Item": "Desktop", "Wattage": 200 },
+      { "Item": "Monitor", "Wattage": 33 },
+      { "Item": "Desk Fan", "Wattage": 33 },
+      { "Item": "Portable Heater", "Wattage": 1500 },
+      { "Item": "Desk Lamp", "Wattage": 40 }
+    ];
 
-	const EMBEDDED_DATA = [
-	  { "Equipment": "27' Monitor",                    "Footprint(CO2e)": 146.3 	},
-	  { "Equipment": "24' Monitor",                    "Footprint(CO2e)": 99 		},
-	  { "Equipment": "Smaller Monitor",                "Footprint(CO2e)": 66.19 	},
-	  { "Equipment": "Desktop",                        "Footprint(CO2e)": 140.1		},
-	  { "Equipment": "Laptop",                         "Footprint(CO2e)": 128 		},
-	  { "Equipment": "Desktop (High Performanc)",      "Footprint(CO2e)": 1076 		},
-	  { "Equipment": "Laptop (High Performance)",      "Footprint(CO2e)": 359.44 	},
-	  { "Equipment": "Docking Station",                "Footprint(CO2e)": 38.03 	},
-	  { "Equipment": "Keyboard",                       "Footprint(CO2e)": 14.49 	},
-	  { "Equipment": "Mouse",                          "Footprint(CO2e)": 5.51 		},
-	  { "Equipment": "Headset",                        "Footprint(CO2e)": 5.77 		},
-	  { "Equipment": "Webcam",                         "Footprint(CO2e)": 5.43 		},
-	  { "Equipment": "USB Drove/DVD",                  "Footprint(CO2e)": 1.77 		},
-	  { "Equipment": "Office Desk",                    "Footprint(CO2e)": 78 		},
-	  { "Equipment": "Office Chair",                   "Footprint(CO2e)": 74 		},
-	  { "Equipment": "Footrest",                       "Footprint(CO2e)": 8.2 		},
-	  { "Equipment": "Keyboard rest (High Performanc)","Footprint(CO2e)": 1.4 		},
-	  { "Equipment": "Visualiser",                     "Footprint(CO2e)": 184 		}
-	];
-
+    const EMBEDDED_DATA = [
+      { "Equipment": "27' Monitor", "Footprint(CO2e)": 146.3 },
+      { "Equipment": "24' Monitor", "Footprint(CO2e)": 99 },
+      { "Equipment": "Smaller Monitor", "Footprint(CO2e)": 66.19 },
+      { "Equipment": "Desktop", "Footprint(CO2e)": 140.1 },
+      { "Equipment": "Laptop", "Footprint(CO2e)": 128 },
+      { "Equipment": "Desktop (High Performanc)", "Footprint(CO2e)": 1076 },
+      { "Equipment": "Laptop (High Performance)", "Footprint(CO2e)": 359.44 },
+      { "Equipment": "Docking Station", "Footprint(CO2e)": 38.03 },
+      { "Equipment": "Keyboard", "Footprint(CO2e)": 14.49 },
+      { "Equipment": "Mouse", "Footprint(CO2e)": 5.51 },
+      { "Equipment": "Headset", "Footprint(CO2e)": 5.77 },
+      { "Equipment": "Webcam", "Footprint(CO2e)": 5.43 },
+      { "Equipment": "USB Drove/DVD", "Footprint(CO2e)": 1.77 },
+      { "Equipment": "Office Desk", "Footprint(CO2e)": 78 },
+      { "Equipment": "Office Chair", "Footprint(CO2e)": 74 },
+      { "Equipment": "Footrest", "Footprint(CO2e)": 8.2 },
+      { "Equipment": "Keyboard rest (High Performanc)", "Footprint(CO2e)": 1.4 },
+      { "Equipment": "Visualiser", "Footprint(CO2e)": 184 }
+    ];
   </script>
-  
-  <!-- Funtions -->
+
+  <!-- =========================================================
+       SCRIPT BLOCK 2: Utilities, factors, and lookups
+       ========================================================= -->
   <script>
-    //BOX DISABLE FUNCTION FOR TRANSPORT
-	function onTransportChanged() {
-	  const modeSel = document.getElementById("t_mode");
-	  const sizeSel = document.getElementById("t_size");
-	  const fuelSel = document.getElementById("t_fuel");
+    // --- Enable/disable transport dropdowns based on chosen mode ---
+    function onTransportChanged() {
+      const modeSel = document.getElementById("t_mode");
+      const sizeSel = document.getElementById("t_size");
+      const fuelSel = document.getElementById("t_fuel");
 
-	  const mode = modeSel.value;
+      const mode = modeSel.value;
 
-	  //Bus Rail Walking Bicycle Electric Bicycle
-		if (["bus", "rail", "walking", "bicycle", "electric bicycle"].includes(mode.toLowerCase())) {
-		sizeSel.disabled = true;
-		fuelSel.disabled = true;
+      // Bus / Rail / Walking / Bicycle / Electric Bicycle
+      if (["bus", "rail", "walking", "bicycle", "electric bicycle"].includes(mode.toLowerCase())) {
+        sizeSel.disabled = true;
+        fuelSel.disabled = true;
 
-		sizeSel.value = null; 
-		fuelSel.value = "Standard";
-	  }
-	  //Motorbike
-	  else if (mode.toLowerCase() === "motorbike") {
-		sizeSel.disabled = false;
-		fuelSel.disabled = true;
+        sizeSel.value = null;
+        fuelSel.value = "Standard";
+      }
+      // Motorbike
+      else if (mode.toLowerCase() === "motorbike") {
+        sizeSel.disabled = false;
+        fuelSel.disabled = true;
 
-		fuelSel.value = "Standard";
-	  }
-	  //Car
-	  else {
-		sizeSel.disabled = false;
-		fuelSel.disabled = false;
-		}
-	}
-	
-	//BOX DISABLE FUNCTION FOR HEATING
-	function onHeatingChanged() {
-	  const extraSel      = document.getElementById("h_extra_hours");
-	  const tempSel       = document.getElementById("h_temp");
-	  const fuelSel       = document.getElementById("h_fuel");
-	  const includeRestEl = document.getElementById("h_include_rest");
+        fuelSel.value = "Standard";
+      }
+      // Car (all fields enabled)
+      else {
+        sizeSel.disabled = false;
+        fuelSel.disabled = false;
+      }
+    }
 
-	  const occupied   = document.getElementById("h_Occupied").checked;
-	  const winterOff  = document.getElementById("b_winter").checked;
-	  
-	  const disable = occupied || winterOff;
+    // --- Enable/disable heating controls based on occupancy and winter flag ---
+    function onHeatingChanged() {
+      const extraSel = document.getElementById("h_extra_hours");
+      const tempSel = document.getElementById("h_temp");
+      const fuelSel = document.getElementById("h_fuel");
+      const includeRestEl = document.getElementById("h_include_rest");
 
-	  [extraSel, tempSel, fuelSel, includeRestEl].forEach(el => {
-		if (!el) return;
-		el.disabled = disable;
-	  });
-	}
-	  
-	  
-	function uniqueSorted(list) {
-      return Array.from(new Set(list)).filter(x => x != null && String(x).trim() !== "")
+      const occupied = document.getElementById("h_Occupied").checked;
+      const winterOff = document.getElementById("b_winter").checked;
+
+      const disable = occupied || winterOff;
+
+      [extraSel, tempSel, fuelSel, includeRestEl].forEach((el) => {
+        if (!el) return;
+        el.disabled = disable;
+      });
+    }
+
+    // --- Helper: unique, sorted list from an array (filters out null/empty) ---
+    function uniqueSorted(list) {
+      return Array.from(new Set(list))
+        .filter((x) => x != null && String(x).trim() !== "")
         .sort((a, b) => String(a).localeCompare(String(b)));
     }
 
+    // --- Grid electricity factor derived from FUEL_DATA ---
     function getGridFactor() {
       const keywords = ["electric", "grid"];
       for (const row of FUEL_DATA) {
         const name = String(row["Fuel"] || "").toLowerCase();
-        if (keywords.some(k => name.includes(k))) {
+        if (keywords.some((k) => name.includes(k))) {
           return Number(row["CO2e/kwh"]);
         }
       }
+      // Fallback to the first entry if no match found
       return Number(FUEL_DATA[0]["CO2e/kwh"]);
     }
+
     const GRID_CO2E_PER_KWH = getGridFactor();
 
+    // --- Lookup: heating fuel factor by fuel name (kg CO₂e/kWh) ---
     function getFuelFactor(name) {
       if (!name) return 0;
       const lc = String(name).toLowerCase();
-      let exact = FUEL_DATA.find(r => String(r["Fuel"]).toLowerCase() === lc);
+      let exact = FUEL_DATA.find((r) => String(r["Fuel"]).toLowerCase() === lc);
       if (!exact) {
-        exact = FUEL_DATA.find(r => String(r["Fuel"]).toLowerCase().includes(lc));
+        exact = FUEL_DATA.find((r) => String(r["Fuel"]).toLowerCase().includes(lc));
       }
       return exact ? Number(exact["CO2e/kwh"]) : 0;
     }
 
+    // --- Lookup: transport factor (kg CO₂e/mile) based on mode/size/fuel ---
     function getTransportFactor(mode, size, fuel) {
       if (!mode || !fuel) return 0;
+
       const fuelKeyMap = {
         diesel: "Diesel",
         petrol: "Petrol",
@@ -535,29 +600,40 @@
         bev: "BatteryElectric",
         standard: "Standard"
       };
+
       const key = fuelKeyMap[String(fuel).replace(/\s+/g, "").toLowerCase()];
       if (!key) return 0;
 
-      const rows = TRANSPORT_DATA.filter(r =>
-        String(r["Mode"]).toLowerCase() === String(mode).toLowerCase()
+      const rows = TRANSPORT_DATA.filter(
+        (r) => String(r["Mode"]).toLowerCase() === String(mode).toLowerCase()
       );
 
-      let row = rows.find(r =>
-        String(r["Size"]).toLowerCase() === String(size).toLowerCase()
+      // Try to match size first
+      let row = rows.find(
+        (r) => String(r["Size"]).toLowerCase() === String(size).toLowerCase()
       );
+
+      // Fallback to any row with a valid value for that fuel key
       if (!row || row[key] == null || row[key] === "-" || row[key] === "") {
-        row = rows.find(r => r[key] != null && r[key] !== "-" && r[key] !== "");
+        row = rows.find(
+          (r) => r[key] != null && r[key] !== "-" && r[key] !== ""
+        );
       }
+
       return row ? Number(row[key]) : 0;
     }
 
+    // --- Find nearest heating data row based on extra hours and temperature ---
     function nearestHeatingRow(extraHours, tempC) {
       if (!HEATING_DATA.length) return null;
+
       const dist = (row) =>
         Math.abs(Number(row["Extra hours/day"]) - extraHours) +
         Math.abs(Number(row["Required temperature (°C)"]) - tempC);
+
       let best = HEATING_DATA[0];
       let bestD = dist(best);
+
       for (const r of HEATING_DATA.slice(1)) {
         const d = dist(r);
         if (d < bestD) {
@@ -568,6 +644,7 @@
       return best;
     }
 
+    // --- Map of electrical item -> wattage ---
     function electricalWattMap() {
       const map = {};
       for (const r of ELECTRICAL_DATA) {
@@ -578,8 +655,10 @@
       }
       return map;
     }
+
     const ELECTRICAL_WATTS = electricalWattMap();
 
+    // --- Map of embedded equipment -> embodied footprint (kg CO₂e) ---
     function embeddedMap() {
       const map = {};
       for (const r of EMBEDDED_DATA) {
@@ -590,133 +669,161 @@
       }
       return map;
     }
+
     const EMBEDDED_FOOTPRINT = embeddedMap();
   </script>
-  <!-- Initialisation Functions -->
+
+  <!-- =========================================================
+       SCRIPT BLOCK 3: UI initialisation, row creation & calculation
+       ========================================================= -->
   <script>
+    // --- Initialise transport controls and event listeners ---
     function initTransportControls() {
       const modeSel = document.getElementById("t_mode");
       const sizeSel = document.getElementById("t_size");
       const fuelSel = document.getElementById("t_fuel");
 
-      const modes = uniqueSorted(TRANSPORT_DATA.map(r => r["Mode"]));
-      const sizes = uniqueSorted(TRANSPORT_DATA.map(r => r["Size"]));
+      const modes = uniqueSorted(TRANSPORT_DATA.map((r) => r["Mode"]));
+      const sizes = uniqueSorted(TRANSPORT_DATA.map((r) => r["Size"]));
       const fuels = ["Diesel", "Petrol", "Hybrid", "PluginHybrid", "BatteryElectric", "Standard"];
 
-      modeSel.innerHTML = modes.map(m => `<option value="${m}">${m}</option>`).join("");
-      sizeSel.innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join("");
-      fuelSel.innerHTML = fuels.map(f => `<option value="${f}">${f}</option>`).join("");
-	  
-	  document.getElementById("t_mode").addEventListener("change", onTransportChanged);  // Listeners for change in trannsport boxes
-	  document.getElementById("t_size").addEventListener("change", onTransportChanged);
-	  document.getElementById("t_fuel").addEventListener("change", onTransportChanged);
+      modeSel.innerHTML = modes.map((m) => `<option value="${m}">${m}</option>`).join("");
+      sizeSel.innerHTML = sizes.map((s) => `<option value="${s}">${s}</option>`).join("");
+      fuelSel.innerHTML = fuels.map((f) => `<option value="${f}">${f}</option>`).join("");
+
+      // Listeners for change in transport boxes
+      document.getElementById("t_mode").addEventListener("change", onTransportChanged);
+      document.getElementById("t_size").addEventListener("change", onTransportChanged);
+      document.getElementById("t_fuel").addEventListener("change", onTransportChanged);
     }
 
+    // --- Initialise heating controls and event listeners ---
     function initHeatingControls() {
-	  const extraSel = document.getElementById("h_extra_hours");
-	  const tempSel = document.getElementById("h_temp");
-	  const fuelSel = document.getElementById("h_fuel");
-	  
-	  const extra = uniqueSorted(HEATING_DATA.map(r => r["Extra hours/day"]));
-	  const temp = uniqueSorted(HEATING_DATA.map(r => r["Required temperature (°C)"]));
-      const fuels = uniqueSorted(FUEL_DATA.map(r => r["Fuel"]));
-	  
-	  extraSel.innerHTML = extra.map(v => `<option value="${v}">${v}</option>`).join("");
-	  tempSel.innerHTML = temp.map(v => `<option value="${v}">${v} °C</option>`).join("");
-      fuelSel.innerHTML = fuels.map(f => `<option value="${f}">${f}</option>`).join("");
-	  
-	  document.getElementById("h_Occupied").addEventListener("change", onHeatingChanged);
-	  document.getElementById("b_winter").addEventListener("change", onHeatingChanged);
-	  
-	  onHeatingChanged();
+      const extraSel = document.getElementById("h_extra_hours");
+      const tempSel = document.getElementById("h_temp");
+      const fuelSel = document.getElementById("h_fuel");
+
+      const extra = uniqueSorted(HEATING_DATA.map((r) => r["Extra hours/day"]));
+      const temp = uniqueSorted(HEATING_DATA.map((r) => r["Required temperature (°C)"]));
+      const fuels = uniqueSorted(FUEL_DATA.map((r) => r["Fuel"]));
+
+      extraSel.innerHTML = extra.map((v) => `<option value="${v}">${v}</option>`).join("");
+      tempSel.innerHTML = temp.map((v) => `<option value="${v}">${v} °C</option>`).join("");
+      fuelSel.innerHTML = fuels.map((f) => `<option value="${f}">${f}</option>`).join("");
+
+      document.getElementById("h_Occupied").addEventListener("change", onHeatingChanged);
+      document.getElementById("b_winter").addEventListener("change", onHeatingChanged);
+
+      onHeatingChanged();
     }
 
-	function addElectricalRow() {
-	  const container = document.getElementById("electrical-rows");
-	  const items = uniqueSorted(ELECTRICAL_DATA.map(r => r["Item"]));
-	  const idx = container.children.length;
+    // --- Add a new electrical device row to the UI ---
+    function addElectricalRow() {
+      const container = document.getElementById("electrical-rows");
+      const items = uniqueSorted(ELECTRICAL_DATA.map((r) => r["Item"]));
 
-	  const wrapper = document.createElement("div");
-	  wrapper.className = "grid electrical-row";
-	  wrapper.innerHTML = `
-		<div>
-		  <label>Device</label>
-		  <select data-type="e-item">
-			${items.map(i => `<option value="${i}">${i}</option>`).join("")}
-		  </select>
-		</div>
-		<div>
-		  <label>Hours per day</label>
-		  <input type="number" data-type="e-hours" min="0" step="0.5" value="8">
-		</div>
-		<div>
-		  <label>Months per year</label>
-		  <input type="number" data-type="e-months" min="0" max="12" step="1" value="220">
-		</div>
-		<div style="display:flex; align-items:flex-end;">
-		  <button type="button" class="remove-row-btn" style="
-			padding:4px 10px; 
-			background:#b91c1c; 
-			color:white; 
-			border:none; 
-			border-radius:6px;
-			cursor:pointer;
-		  ">Remove</button>
-		</div>
-	  `;
+      const wrapper = document.createElement("div");
+      wrapper.className = "grid electrical-row";
+      wrapper.innerHTML = `
+        <div>
+          <label>Device</label>
+          <select data-type="e-item">
+            ${items.map((i) => `<option value="${i}">${i}</option>`).join("")}
+          </select>
+        </div>
+        <div>
+          <label>Hours per day</label>
+          <input type="number" data-type="e-hours" min="0" step="0.5" value="8">
+        </div>
+        <div>
+          <label>Months per year</label>
+          <input type="number" data-type="e-months" min="0" max="12" step="1" value="12">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button
+            type="button"
+            class="remove-row-btn"
+            style="
+              padding: 4px 10px;
+              background: #b91c1c;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+            "
+          >
+            Remove
+          </button>
+        </div>
+      `;
 
-	  wrapper.querySelector(".remove-row-btn").addEventListener("click", () => {
-		wrapper.remove();
-	  });
+      wrapper.querySelector(".remove-row-btn").addEventListener("click", () => {
+        wrapper.remove();
+      });
 
-	  container.appendChild(wrapper);
-	}
+      container.appendChild(wrapper);
+    }
 
-	function addEmbeddedRow() {
-	  const container = document.getElementById("embedded-rows");
-	  const items = uniqueSorted(EMBEDDED_DATA.map(r => r["Equipment"]));
+    // --- Add a new embedded equipment row to the UI ---
+    function addEmbeddedRow() {
+      const container = document.getElementById("embedded-rows");
+      const items = uniqueSorted(EMBEDDED_DATA.map((r) => r["Equipment"]));
 
-	  const wrapper = document.createElement("div");
-	  wrapper.className = "grid embedded-row";
-	  wrapper.innerHTML = `
-	  
-		<div>
-		  <label>Equipment</label>
-		  <select data-type="em-item">
-			${items.map(i => `<option value="${i}">${i}</option>`).join("")}
-		  </select>
-		</div>
-		<div>
-		  <label>Count</label>
-		  <input type="number" data-type="em-count" min="0" step="1" value="1">
-		</div>
-		<div style="display:flex; align-items:flex-end;">
-		  <button type="button" class="remove-row-btn" style="
-			padding:4px 10px; 
-			background:#b91c1c; 
-			color:white; 
-			border:none; 
-			border-radius:6px;
-			cursor:pointer;
-		  ">Remove</button>
-		</div>
-	  `;
+      const wrapper = document.createElement("div");
+      wrapper.className = "grid embedded-row";
+      wrapper.innerHTML = `
+        <div>
+          <label>Equipment</label>
+          <select data-type="em-item">
+            ${items.map((i) => `<option value="${i}">${i}</option>`).join("")}
+          </select>
+        </div>
+        <div>
+          <label>Count</label>
+          <input type="number" data-type="em-count" min="0" step="1" value="1">
+        </div>
+        <div>
+          <label>Second hand/referbished</label>
+          <label style="display:flex; align-items:center; gap:0.35rem; font-weight:400;">
+            <input type="checkbox" data-type="em-secondhand">
+          </label>
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button
+            type="button"
+            class="remove-row-btn"
+            style="
+              padding: 4px 10px;
+              background: #b91c1c;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+            "
+          >
+            Remove
+          </button>
+        </div>
+      `;
 
-	  wrapper.querySelector(".remove-row-btn").addEventListener("click", () => {
-		wrapper.remove();
-	  });
+      wrapper.querySelector(".remove-row-btn").addEventListener("click", () => {
+        wrapper.remove();
+      });
 
-	  container.appendChild(wrapper);
-	}
+      container.appendChild(wrapper);
+    }
 
-	//CALCULATIONS
-
+    // --- Main calculation entry point (runs when user clicks "Calculate") ---
     function calculate() {
-	//BEHAVIOUR
-	  const bdays = document.getElementById("b_days").value;
-	  const annualdays = 220*(bdays/5);
+      // ----------------------------------------------------
+      // Behaviour assumptions
+      // ----------------------------------------------------
+      const bdays = document.getElementById("b_days").value;
+      const annualdays = 220 * (bdays / 5);
 
-	//TRANSPORT	
+      // ----------------------------------------------------
+      // Transport emissions (annual delta)
+      // ----------------------------------------------------
       const tMode = document.getElementById("t_mode").value;
       const tSize = document.getElementById("t_size").value;
       const tFuel = document.getElementById("t_fuel").value;
@@ -725,106 +832,143 @@
       let transportKg = 0;
 
       if (tDist > 0 && tMode && tFuel) {
-        const tfactor = getTransportFactor(tMode, tSize, tFuel);					// Finds th transport factor in the json row with corresponding mode/size/fuel
-        transportKg = +(tDist * tfactor * annualdays *0.67).toFixed(4);				//Calculates annual transport emissions based on distance, factor total commute days per year and 0.67 SCALING FACTOR FOR REBOUNB EFFECTS -->
+        // Finds the transport factor in the JSON row with corresponding mode/size/fuel
+        const tfactor = getTransportFactor(tMode, tSize, tFuel);
+
+        // Calculates annual transport emissions based on:
+        // distance, factor, total commute days per year, and 0.67 scaling factor
+        // for rebound effects
+        transportKg = +(tDist * tfactor * annualdays * 0.67).toFixed(4);
       }
 
-	
-    //ELECTRICAL
-	  const bRenewable =document.getElementById("b_renewable").checked;
+      // ----------------------------------------------------
+      // Electrical (use phase) – includes baseline lighting
+      // ----------------------------------------------------
+      const bRenewable = document.getElementById("b_renewable").checked;
+
       const eContainers = document.querySelectorAll("#electrical-rows > .grid");
-      let totalKwh = 17*bdays/5;													//Acounts for base lighting usage
-      eContainers.forEach((wrap, idx) => {
+
+      // Accounts for base lighting usage
+      let totalKwh = 17 * (bdays / 5);
+
+      eContainers.forEach((wrap) => {
         const itemSel = wrap.querySelector('[data-type="e-item"]');
         const hoursInput = wrap.querySelector('[data-type="e-hours"]');
         const monthsInput = wrap.querySelector('[data-type="e-months"]');
         if (!itemSel || !hoursInput || !monthsInput) return;
+
         const item = itemSel.value.toLowerCase();
         const hours = Number(hoursInput.value || 0);
-        const days = (Number(monthsInput.value || 0))*220/12;
+        const days = (Number(monthsInput.value || 0) * 220) / 12;
         const watt = ELECTRICAL_WATTS[item] || 0;
         const kwh = (watt * hours * days) / 1000.0;
+
         totalKwh += kwh;
       });
-	  
+
       let gridFactor = GRID_CO2E_PER_KWH;
-	  
-	  if (bRenewable) {
-	    gridFactor = 0.0167 - GRID_CO2E_PER_KWH
-		};
-		
+
+      // NOTE: this is deliberately a delta vs baseline (renewables vs non-renewables)
+      if (bRenewable) {
+        gridFactor = 0.0167 - GRID_CO2E_PER_KWH;
+      }
+
       const electricalKg = +(totalKwh * gridFactor).toFixed(4);
 
-    //HEATING
+      // ----------------------------------------------------
+      // Heating – teleworking-driven extra demand
+      // ----------------------------------------------------
       const hExtra = Number(document.getElementById("h_extra_hours").value || 0);
       const hTemp = Number(document.getElementById("h_temp").value || 0);
       const hFuel = document.getElementById("h_fuel").value;
       const hIncludeRest = document.getElementById("h_include_rest").checked;
       const hOccupied = document.getElementById("h_Occupied").checked;
-	  const bWinterOff   = document.getElementById("b_winter").checked;
-	
+      const bWinterOff = document.getElementById("b_winter").checked;
+
       let heatingKg = 0;
       let heatingKwh = 0;
 
-    if (hFuel && hExtra && hTemp) {
-      const row = nearestHeatingRow(hExtra, hTemp);
-      if (row) {
-        const kwhRoom = Number(row["Heating one office room (kWh/year/person)"]) || 0;
-        const kwhRest = Number(row["Heating the rest of property (kWh/year/person)"]) || 0;
+      if (hFuel && hExtra && hTemp) {
+        const row = nearestHeatingRow(hExtra, hTemp);
+        if (row) {
+          const kwhRoom =
+            Number(row["Heating one office room (kWh/year/person)"]) || 0;
+          const kwhRest =
+            Number(row["Heating the rest of property (kWh/year/person)"]) || 0;
 
-        // Base energy: office room is extra-heated when you telework
-        heatingKwh = kwhRoom;
+          // Base energy: office room is extra-heated when you telework
+          heatingKwh = kwhRoom;
 
-        if (hIncludeRest) {
-          heatingKwh = kwhRest;
+          // If you heat the rest of the property instead of just the office
+          if (hIncludeRest) {
+            heatingKwh = kwhRest;
+          }
+
+          // If already occupied, no additional heating attributed to telework
+          if (hOccupied) {
+            heatingKwh = 0;
+          }
+
+          // If not teleworking in winter, no heating impact
+          if (bWinterOff) {
+            heatingKwh = 0;
+          }
+
+          let fuelFactor = getFuelFactor(hFuel); // kg CO₂e per kWh
+
+          // Renewable electricity override for electric radiators
+          if (bRenewable && hFuel === "Electric Radiator") {
+            fuelFactor = 0.0167;
+          }
+
+          heatingKg = +(heatingKwh * fuelFactor).toFixed(4);
         }
-
-		if (hOccupied) {
-		  heatingKwh = 0
-		}
-		
-		if (bWinterOff) {
-		  heatingKwh = 0
-		}
-		
-        let fuelFactor = getFuelFactor(hFuel); // kg CO2e per kWh
-		
-		if ((bRenewable) && (hFuel === "Electric Radiator")) {
-	    fuelFactor = 0.0167 
-		};
-		
-        heatingKg = +(heatingKwh * fuelFactor).toFixed(4);
       }
-    }
 
-    //EMBEDDED
+      // ----------------------------------------------------
+      // Embedded equipment – one-off footprint, optionally zero for second-hand
+      // ----------------------------------------------------
       const emContainers = document.querySelectorAll("#embedded-rows > .grid");
       let embeddedKg = 0;
+
       emContainers.forEach((wrap) => {
         const itemSel = wrap.querySelector('[data-type="em-item"]');
         const countInput = wrap.querySelector('[data-type="em-count"]');
+        const secondHandInput = wrap.querySelector('[data-type="em-secondhand"]');
         if (!itemSel || !countInput) return;
+
         const item = itemSel.value.toLowerCase();
         const count = Number(countInput.value || 0);
-        const footprint = EMBEDDED_FOOTPRINT[item] || 0;
+        const secondHand = secondHandInput ? secondHandInput.checked : false;
+
+        let footprint = EMBEDDED_FOOTPRINT[item] || 0;
+
+        // If second-hand, we treat the footprint as zero
+        if (secondHand) {
+          footprint = 0;
+        }
+
         embeddedKg += footprint * count;
       });
+
       embeddedKg = +embeddedKg.toFixed(4);
 
+      // ----------------------------------------------------
+      // Net impact summarised (first year)
+      // ----------------------------------------------------
       const totalKg = +(-transportKg + heatingKg + electricalKg + embeddedKg).toFixed(4);
 
       // Break-even years for embedded emissions vs saved transport/heating
       let breakEven = null;
-      const annualSaving = transportKg - heatingKg - electricalKg; 
+      const annualSaving = transportKg - heatingKg - electricalKg;
       if (annualSaving !== 0) {
         breakEven = +(embeddedKg / annualSaving).toFixed(2);
       }
-	  
-	  if (breakEven <= 0){
-	  breakEven = null
-	  }
-	  
-	  
+
+      if (breakEven <= 0) {
+        breakEven = null;
+      }
+
       const results = {
         transport_kg: transportKg,
         heating_kg: heatingKg,
@@ -839,7 +983,7 @@
 
       const box = document.getElementById("results-box");
 
-      // Formatting helpers
+      // --- Formatting helpers for result display ---
       const fmtNumber = (v, dp = 2) => {
         if (v == null || isNaN(v)) return "–";
         return v.toFixed(dp);
@@ -863,6 +1007,7 @@
           ? `${results.assumptions.grid_factor_kg_per_kwh.toFixed(4)} kg CO₂e / kWh`
           : "n/a";
 
+      // --- Render the styled "pro" results block ---
       box.innerHTML = `
         <div class="results-pro">
           <div class="results-header-row">
@@ -924,57 +1069,68 @@
 
       // Optional: still log raw data to console for debugging
       console.log("Calculation results:", results);
+    }
 
-	}
-
-    //BOOTRSTRAP
-  
+    // --- Bootstrap function to wire up UI on DOM ready ---
     function init() {
       initTransportControls();
       initHeatingControls();
 
-      // start with one row each
+      // Start with one row each
       addElectricalRow();
       addEmbeddedRow();
 
-      document.getElementById("add-electrical-row").addEventListener("click", addElectricalRow);
-      document.getElementById("add-embedded-row").addEventListener("click", addEmbeddedRow);
-      document.getElementById("btn-calc").addEventListener("click", calculate);
+      // Add row handlers
+      document
+        .getElementById("add-electrical-row")
+        .addEventListener("click", addElectricalRow);
+      document
+        .getElementById("add-embedded-row")
+        .addEventListener("click", addEmbeddedRow);
+
+      // Main calculation trigger
+      document
+        .getElementById("btn-calc")
+        .addEventListener("click", calculate);
     }
 
     window.addEventListener("DOMContentLoaded", init);
   </script>
-  
-  <!-- DEBUG SCRIPT -->
+
+  <!-- =========================================================
+       SCRIPT BLOCK 4: Debug script (simple visual JS health check)
+       ========================================================= -->
   <script>
-  const debugBanner = document.getElementById("debug-banner");
+    const debugBanner = document.getElementById("debug-banner");
 
-  // --- Mark script load success ---
-  function debugOK() {
-    debugBanner.style.background = "#0a7f2e"; // green
-    debugBanner.textContent = "Debug: JS OK";
-  }
-
-  // --- Global error handler ---
-  window.addEventListener("error", (ev) => {
-    debugBanner.style.background = "#b91c1c"; // red
-    debugBanner.textContent = "JS ERROR: " + ev.message;
-  });
-
-  // --- Detect unhandled promise rejections ---
-  window.addEventListener("unhandledrejection", (ev) => {
-    debugBanner.style.background = "#b91c1c"; // red
-    debugBanner.textContent = "Promise ERROR: " + ev.reason;
-  });
-
-  // Mark OK once DOM is ready and script hasn't blown up
-  window.addEventListener("DOMContentLoaded", () => {
-    // Only turn green if no error fired yet
-    if (!debugBanner.textContent.startsWith("JS ERROR") &&
-        !debugBanner.textContent.startsWith("Promise ERROR")) {
-      debugOK();
+    // --- Mark script load success ---
+    function debugOK() {
+      debugBanner.style.background = "#0a7f2e"; // green
+      debugBanner.textContent = "Debug: JS OK";
     }
-  });
-</script>
+
+    // --- Global error handler (sync errors) ---
+    window.addEventListener("error", (ev) => {
+      debugBanner.style.background = "#b91c1c"; // red
+      debugBanner.textContent = "JS ERROR: " + ev.message;
+    });
+
+    // --- Detect unhandled promise rejections ---
+    window.addEventListener("unhandledrejection", (ev) => {
+      debugBanner.style.background = "#b91c1c"; // red
+      debugBanner.textContent = "Promise ERROR: " + ev.reason;
+    });
+
+    // Mark OK once DOM is ready and script hasn't blown up
+    window.addEventListener("DOMContentLoaded", () => {
+      // Only turn green if no error fired yet
+      if (
+        !debugBanner.textContent.startsWith("JS ERROR") &&
+        !debugBanner.textContent.startsWith("Promise ERROR")
+      ) {
+        debugOK();
+      }
+    });
+  </script>
 </body>
 </html>
