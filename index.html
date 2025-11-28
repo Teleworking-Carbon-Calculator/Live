@@ -2,13 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Telework Carbon Calculator (Browser Only)</title>
+  <title>Telework Carbon Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!--
-    Core styles for layout, typography, cards, grids, and results display.
-    Only whitespace/formatting changed from original – no functional changes.
-  -->
   <style>
     /* --- Base layout & typography --- */
     body {
@@ -79,6 +75,9 @@
 
     input[type="number"] {
       -moz-appearance: textfield;
+	  max-width: 230px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     input::-webkit-outer-spin-button,
@@ -102,33 +101,47 @@
     button:hover {
       background: #1d4ed8;
     }
-
-    /* --- Raw results preformatted block (used by the styled widget) --- */
-    .results {
-      font-family: "Consolas", "SF Mono", monospace;
-      font-size: 0.9rem;
-      white-space: pre-wrap;
-      background: #0f172a;
-      color: #e5e7eb;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      overflow-x: auto;
-    }
-
+	
+	/* -- Limit width of numeric inputs to match dropdowns -- */
+	.transport-row input[type="number"] {
+      max-width: 230px;
+      width: 100%;
+      box-sizing: border-box;
+	}
+	
     .muted {
       color: #6b7280;
       font-size: 0.85rem;
     }
 
-    /* --- Styled "pro" results widget --- */
-    .results-pro {
-      background: #020617;
-      color: #e5e7eb;
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
-    }
+    /* ---results widget --- */
+
+	.results {
+	  font-family: "Consolas", "SF Mono", monospace;
+	  background: #020617;
+	  color: #e5e7eb;
+	  border-radius: 12px;
+	  padding: 1rem 1.25rem;
+	  font-size: 0.9rem;
+	  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
+	  white-space: normal;
+	  overflow-x: auto;
+	}
+
+	.result-final {
+		font-size: 1.4rem;
+		font-weight: 700;
+		display: inline-block;
+	}
+
+	/* Colour states */
+	.result-final.positive {
+		color: #ef4444;          /* red */
+	}
+
+	.result-final.negative {
+		color: #10b981;          /* green */
+	}
 
     .results-header-row {
       display: flex;
@@ -188,11 +201,32 @@
       margin-bottom: 0.25rem;
     }
 
+	.results-main-row {
+	  display: flex;
+	  gap: 1.5rem;
+	  align-items: flex-start;
+	  margin-top: 0.75rem;
+	  flex-wrap: wrap;
+	}
+
+	.results-left {
+	  flex: 1 1 500px;
+	}
+
+	.results-right {
+	  flex: 2 1 500px;
+
+	}
+
+	.results-metrics-block {
+	  margin-bottom: 0.9rem;
+	}
+
     .results-metric {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin: 2px 0;
+      margin: 2rem 0;
     }
 
     .results-metric-label {
@@ -204,6 +238,14 @@
       font-size: 0.9rem;
       font-weight: 600;
     }
+	
+	.result-metric-label.positive {
+		color: #ef4444;          /* red */
+	}
+
+	.result-metric-label.negative {
+		color: #10b981;          /* green */
+	}
 
     .results-metric-muted {
       color: #9ca3af;
@@ -225,6 +267,16 @@
       color: #e5e7eb;
       margin-left: 0.5rem;
     }
+	
+	.results-chart {
+	  margin-top: 1rem;
+	  }
+
+	.results-chart svg {
+	  width: 100%;
+	  height: 300px;
+	  display: block;
+	}
 
     /* --- Disabled select state (used for transport/heating logic) --- */
     select:disabled {
@@ -251,19 +303,20 @@
 </head>
 
 <body>
-  <h1>Telework Carbon Calculator (Client-side)</h1>
-  <p class="muted">
-    <!-- Optional intro text can go here -->
+  <h1>Telework Carbon Calculator</h1>
+  <p class="muted"> 
+  This tool exists to estimate your relative carbon impacts from teleworking compared to regular office work. Its calculations are estimates and aims to encourage more thought about how to minimise your carbon impact whilst teleworking.
+  Please fill in the following boxes and press calculate to see your results.
   </p>
 
   <!-- =========================================================
        SECTION 0: Behaviour (global teleworking assumptions)
        ========================================================= -->
   <div class="card">
-    <h2>Behaviour</h2>
+    <h2>0. Behaviour</h2>
     <div class="grid">
       <div>
-        <label for="b_days">Days teleworking per week</label>
+        <label for="b_days">Intended teleworking days per week </label>
         <select id="b_days">
           <option value="1">1 day</option>
           <option value="2">2 days</option>
@@ -295,43 +348,32 @@
   <!-- =========================================================
        SECTION 1: Transport
        ========================================================= -->
-  <div class="card">
-    <h2>1. Transport</h2>
+	<div class="card">
+	  <h2>1. Transport</h2>
+	  <p class="muted" style="margin-bottom: 0.5rem;">
+		Please specify the how you currently commute to work. If you use multiple forms of transport for your commute, add a row for each mode and
+		specify approximately what percentage of your journeys uses that mode.
+	  </p>
 
-    <div class="grid">
-      <div>
-        <label for="t_mode">Mode</label>
-        <select id="t_mode"></select>
-        <p class="muted" style="margin: 0.3rem 0 0 0;">
-          If you take multiple forms of transport to work please select your most common form
-        </p>
-      </div>
+	  <div id="transport-rows">
+		<!-- rows inserted by JS -->
+	  </div>
+	  
+	  <p id="transport-percent-warning"
+		style="display:none; color:#ef4444; font-weight:600; margin-top:0.5rem;">
+		The total percentage of transport modes must add up to 100%.
+	  </p>
 
-      <div>
-        <label for="t_size">Vehicle size</label>
-        <select id="t_size"></select>
-      </div>
-
-      <div>
-        <label for="t_fuel">Fuel type</label>
-        <select id="t_fuel"></select>
-      </div>
-
-      <div>
-        <label for="t_distance">Distance (miles)</label>
-        <input type="number" id="t_distance" min="0" step="0.1" value="20" />
-        <p class="muted" style="margin: 0.3rem 0 0 0;">
-          Please describe the core commute to work, not including diversions for shopping or childcare etc...
-        </p>
-      </div>
-    </div>
-  </div>
-
+	  <button type="button" id="add-transport-row">+ Add transport mode</button>
+	</div>
   <!-- =========================================================
        SECTION 2: Heating
        ========================================================= -->
   <div class="card">
     <h2>2. Heating</h2>
+	 <p class="muted" style="margin-bottom: 0.5rem;">
+		Please specify the how you would heat your home whilst teleworking in the winter months, using your most common behaviour for heating temperature and duration.
+	</p>
     <div class="grid">
       <div>
         <label>
@@ -339,7 +381,7 @@
           <input type="checkbox" id="h_Occupied" checked />
         </label>
         <p class="muted" style="margin: 0.3rem 0 0 0;">
-          Tick if someone else is at home during work hours
+          Tick if someone else is at home during work hours thus no extra heating would take place
         </p>
       </div>
 
@@ -425,16 +467,19 @@
       opacity: 0.85;
     "
   ></div>
+  	 <p class="muted" style="margin-bottom: 0.5rem;">
+		Disclamer: These results are only estimates and may not represent your true impact.
+	</p>
 
   <!-- =========================================================
        SCRIPT BLOCK 1: Static data tables (transport, fuel, etc.)
        ========================================================= -->
   <script>
     const TRANSPORT_DATA = [
-      { "Mode": "Car", "Size": "Small", "Diesel": 0.22522, "Petrol": 0.23126, "Hybrid": 0.18143, "PluginHybrid": 0.09782, "BatteryElectric": 0.06894, "Standard": null },
-      { "Mode": "Car", "Size": "Medium", "Diesel": 0.2705, "Petrol": 0.28526, "Hybrid": 0.18492, "PluginHybrid": 0.14983, "BatteryElectric": 0.07442, "Standard": null },
-      { "Mode": "Car", "Size": "Large", "Diesel": 0.33362, "Petrol": 0.43267, "Hybrid": 0.24921, "PluginHybrid": 0.19191, "BatteryElectric": 0.07925, "Standard": null },
-      { "Mode": "Car", "Size": "Average", "Diesel": 0.27334, "Petrol": 0.26473, "Hybrid": 0.20288, "PluginHybrid": 0.17465, "BatteryElectric": 0.07635, "Standard": null },
+      { "Mode": "Car", "Size": "Small", "Diesel": 0.22522, "Petrol": 0.23126, "Hybrid": 0.18143, "PluginHybrid": 0.09782, "BatteryElectric": 0.06894, "Standard": 0.22824 },
+      { "Mode": "Car", "Size": "Medium", "Diesel": 0.2705, "Petrol": 0.28526, "Hybrid": 0.18492, "PluginHybrid": 0.14983, "BatteryElectric": 0.07442, "Standard": 0.27788 },
+      { "Mode": "Car", "Size": "Large", "Diesel": 0.33362, "Petrol": 0.43267, "Hybrid": 0.24921, "PluginHybrid": 0.19191, "BatteryElectric": 0.07925, "Standard": 0.383145 },
+      { "Mode": "Car", "Size": "Average", "Diesel": 0.27334, "Petrol": 0.26473, "Hybrid": 0.20288, "PluginHybrid": 0.17465, "BatteryElectric": 0.07635, "Standard": 0.269035 },
       { "Mode": "Motorbike", "Size": "Small", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.13389 },
       { "Mode": "Motorbike", "Size": "Medium", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.16265 },
       { "Mode": "Motorbike", "Size": "Large", "Diesel": null, "Petrol": null, "Hybrid": null, "PluginHybrid": null, "BatteryElectric": null, "Standard": 0.21326 },
@@ -504,35 +549,41 @@
        SCRIPT BLOCK 2: Utilities, factors, and lookups
        ========================================================= -->
   <script>
-    // --- Enable/disable transport dropdowns based on chosen mode ---
-    function onTransportChanged() {
-      const modeSel = document.getElementById("t_mode");
-      const sizeSel = document.getElementById("t_size");
-      const fuelSel = document.getElementById("t_fuel");
+    // --- Enable/disable transport dropdowns based on chosen mode (per row) ---
+	function onTransportRowChanged(row) {
+	  const modeSel = row.querySelector('[data-type="t-mode"]');
+	  const sizeSel = row.querySelector('[data-type="t-size"]');
+	  const fuelSel = row.querySelector('[data-type="t-fuel"]');
+	  const shareInput = row.querySelector('[data-type="t-share"]');
+	  if (!modeSel || !sizeSel || !fuelSel || !shareInput) return;
 
-      const mode = modeSel.value;
+	  const mode = (modeSel.value || "").toLowerCase();
 
-      // Bus / Rail / Walking / Bicycle / Electric Bicycle
-      if (["bus", "rail", "walking", "bicycle", "electric bicycle"].includes(mode.toLowerCase())) {
-        sizeSel.disabled = true;
-        fuelSel.disabled = true;
+	  // Bus / Rail / Walking / Bicycle / Electric Bicycle
+	  if (["bus", "rail", "walking", "bicycle", "electric bicycle"].includes(mode)) {
+		sizeSel.disabled = true;
+		fuelSel.disabled = true;
+		sizeSel.value = "";
+		fuelSel.value = "Standard";
+	  } else if (mode === "motorbike") {
+		sizeSel.disabled = false;
+		fuelSel.disabled = true;
+		fuelSel.value = "Standard";
+	  } else {
+		// Car & any other road modes with full control
+		sizeSel.disabled = false;
+		fuelSel.disabled = false;
+	  }
 
-        sizeSel.value = null;
-        fuelSel.value = "Standard";
-      }
-      // Motorbike
-      else if (mode.toLowerCase() === "motorbike") {
-        sizeSel.disabled = false;
-        fuelSel.disabled = true;
+	  // Carsharing: only relevant for Car or Motorbike
+	  const isCarOrBike = mode === "car" || mode === "motorbike";
+	  shareInput.disabled = !isCarOrBike;
 
-        fuelSel.value = "Standard";
-      }
-      // Car (all fields enabled)
-      else {
-        sizeSel.disabled = false;
-        fuelSel.disabled = false;
-      }
-    }
+	  // If not car/motorbike, reset to 1 so it doesn't affect other modes
+	  if (!isCarOrBike) {
+		shareInput.value = "1";
+	  }
+	}
 
     // --- Enable/disable heating controls based on occupancy and winter flag ---
     function onHeatingChanged() {
@@ -558,6 +609,10 @@
         .filter((x) => x != null && String(x).trim() !== "")
         .sort((a, b) => String(a).localeCompare(String(b)));
     }
+	
+	let TRANSPORT_MODES = [];
+	let TRANSPORT_SIZES = [];
+	let TRANSPORT_FUELS = [];
 
     // --- Grid electricity factor derived from FUEL_DATA ---
     function getGridFactor() {
@@ -677,24 +732,19 @@
        SCRIPT BLOCK 3: UI initialisation, row creation & calculation
        ========================================================= -->
   <script>
-    // --- Initialise transport controls and event listeners ---
-    function initTransportControls() {
-      const modeSel = document.getElementById("t_mode");
-      const sizeSel = document.getElementById("t_size");
-      const fuelSel = document.getElementById("t_fuel");
+	// --- Initialise transport controls and event listeners ---
+	function initTransportControls() {
+	  // Build option lists once using the static data
+	  TRANSPORT_MODES = uniqueSorted(TRANSPORT_DATA.map((r) => r["Mode"]));
+	  TRANSPORT_SIZES = uniqueSorted(TRANSPORT_DATA.map((r) => r["Size"]));
+	  TRANSPORT_FUELS = ["Diesel", "Petrol", "Hybrid", "PluginHybrid", "BatteryElectric", "Standard"];
 
-      const modes = uniqueSorted(TRANSPORT_DATA.map((r) => r["Mode"]));
-      const sizes = uniqueSorted(TRANSPORT_DATA.map((r) => r["Size"]));
-      const fuels = ["Diesel", "Petrol", "Hybrid", "PluginHybrid", "BatteryElectric", "Standard"];
+	  // Button to add rows
+	  const addBtn = document.getElementById("add-transport-row");
+	  addBtn.addEventListener("click", addTransportRow);
 
-      modeSel.innerHTML = modes.map((m) => `<option value="${m}">${m}</option>`).join("");
-      sizeSel.innerHTML = sizes.map((s) => `<option value="${s}">${s}</option>`).join("");
-      fuelSel.innerHTML = fuels.map((f) => `<option value="${f}">${f}</option>`).join("");
-
-      // Listeners for change in transport boxes
-      document.getElementById("t_mode").addEventListener("change", onTransportChanged);
-      document.getElementById("t_size").addEventListener("change", onTransportChanged);
-      document.getElementById("t_fuel").addEventListener("change", onTransportChanged);
+	  // Start with one row
+	  addTransportRow();
     }
 
     // --- Initialise heating controls and event listeners ---
@@ -813,34 +863,159 @@
       container.appendChild(wrapper);
     }
 
+	// --- Add a new transport mode row to the UI ---
+	function addTransportRow() {
+	  const container = document.getElementById("transport-rows");
+
+	  const wrapper = document.createElement("div");
+	  wrapper.className = "grid transport-row";
+	  wrapper.style.marginBottom = "0.75rem";
+
+	  wrapper.innerHTML = `
+		<div>
+		  <label>Mode</label>
+		  <select data-type="t-mode">
+			${TRANSPORT_MODES.map((m) => `<option value="${m}">${m}</option>`).join("")}
+		  </select>
+		</div>
+		<div>
+		  <label>Vehicle size</label>
+		  <select data-type="t-size">
+			${TRANSPORT_SIZES.map((s) => `<option value="${s}">${s}</option>`).join("")}
+		  </select>
+		</div>
+		<div>
+		  <label>Fuel type</label>
+		  <select data-type="t-fuel">
+			${TRANSPORT_FUELS.map((f) => `<option value="${f}">${f}</option>`).join("")}
+		  </select>
+		</div>
+		<div>
+		  <label>People in vehicle (incl. you)</label>
+		  <input type="number" data-type="t-share" min="1" step="1" value="1">
+		</div>
+		<div>
+		  <label>Distance (miles)</label>
+		  <input type="number" data-type="t-distance" min="0" step="0.1" value="20">
+		  <p class="muted" style="margin: 0.25rem 0 0 0;">
+			One-way distance to university/work.
+		  </p>
+		</div>
+		<div>
+		  <label>% of commute with this mode</label>
+		  <input type="number" data-type="t-percent" min="0" max="100" step="1" value="100">
+		</div>
+		<div style="display:flex; align-items:flex-end;">
+		  <button type="button" class="remove-row-btn">Remove</button>
+		</div>
+	  `;
+
+	  // Hook up remove
+	  wrapper.querySelector(".remove-row-btn").addEventListener("click", () => {
+		wrapper.remove();
+		updateTransportPercentageWarning();
+	  });
+
+	  // Hook up mode/size/fuel change handling for this row
+	  const modeSel = wrapper.querySelector('[data-type="t-mode"]');
+	  const sizeSel = wrapper.querySelector('[data-type="t-size"]');
+	  const fuelSel = wrapper.querySelector('[data-type="t-fuel"]');
+	  const pctInput = wrapper.querySelector('[data-type="t-percent"]');
+
+	  modeSel.addEventListener("change", () => {
+		onTransportRowChanged(wrapper);
+		updateTransportPercentageWarning();
+	  });
+	  sizeSel.addEventListener("change", () => onTransportRowChanged(wrapper));
+	  fuelSel.addEventListener("change", () => onTransportRowChanged(wrapper));
+
+	  // Update warning whenever % changes
+	  if (pctInput) {
+		pctInput.addEventListener("input", updateTransportPercentageWarning);
+	  }
+
+	  container.appendChild(wrapper);
+
+	  // Initialise state & warning
+	  onTransportRowChanged(wrapper);
+	  updateTransportPercentageWarning();
+	}
+	
+	//Gives warning if transport percentage is not eaqul to 100
+	function updateTransportPercentageWarning() {
+	  const rows = document.querySelectorAll("#transport-rows > .transport-row");
+	  let total = 0;
+
+	  rows.forEach(row => {
+		const pctInput = row.querySelector('[data-type="t-percent"]');
+		if (!pctInput) return;
+
+		total += Number(pctInput.value || 0);
+	  });
+
+	  const warn = document.getElementById("transport-percent-warning");
+
+	  if (total !== 100) {
+		warn.style.display = "block";
+	  } else {
+		warn.style.display = "none";
+	  }
+	}
+
     // --- Main calculation entry point (runs when user clicks "Calculate") ---
     function calculate() {
+      // ----------------------------------------------------
+	  // Blocks calculations if percentage is not eaqul to 100
+      // ----------------------------------------------------
+	  updateTransportPercentageWarning();
+	  if (document.getElementById("transport-percent-warning").style.display === "block") {
+	  alert("Transport mode percentages must add up to 100%");
+	  return;
+	  }
       // ----------------------------------------------------
       // Behaviour assumptions
       // ----------------------------------------------------
       const bdays = document.getElementById("b_days").value;
       const annualdays = 220 * (bdays / 5);
 
-      // ----------------------------------------------------
-      // Transport emissions (annual delta)
-      // ----------------------------------------------------
-      const tMode = document.getElementById("t_mode").value;
-      const tSize = document.getElementById("t_size").value;
-      const tFuel = document.getElementById("t_fuel").value;
-      const tDist = Number(document.getElementById("t_distance").value || 0);
+	  // ----------------------------------------------------
+	  // Transport emissions (annual delta, multiple modes)
+	  // ----------------------------------------------------
+	  let transportKg = 0;
 
-      let transportKg = 0;
+	  const tRows = document.querySelectorAll("#transport-rows > .transport-row");
 
-      if (tDist > 0 && tMode && tFuel) {
-        // Finds the transport factor in the JSON row with corresponding mode/size/fuel
-        const tfactor = getTransportFactor(tMode, tSize, tFuel);
+	  tRows.forEach((row) => {
+	    const modeSel = row.querySelector('[data-type="t-mode"]');
+	    const sizeSel = row.querySelector('[data-type="t-size"]');
+	    const fuelSel = row.querySelector('[data-type="t-fuel"]');
+	    const distInput = row.querySelector('[data-type="t-distance"]');
+	    const pctInput = row.querySelector('[data-type="t-percent"]');
+	    const shareInput = row.querySelector('[data-type="t-share"]');
 
-        // Calculates annual transport emissions based on:
-        // distance, factor, total commute days per year, and 0.67 scaling factor
-        // for rebound effects
-        transportKg = +(tDist * tfactor * annualdays * 0.67).toFixed(4);
-      }
+	    if (!modeSel || !fuelSel || !distInput || !pctInput) return;
 
+	    const mode = modeSel.value;
+	    const size = sizeSel ? sizeSel.value : "";
+	    const fuel = fuelSel.value;
+	    const distMiles = Number(distInput.value || 0);
+	    const pct = Number(pctInput.value || 0) / 100; // 0–1
+
+	    // default 1 person if empty/invalid
+	    let shareCount = shareInput ? Number(shareInput.value || 1) : 1;
+	    if (!isFinite(shareCount) || shareCount <= 0) shareCount = 1;
+
+	    if (!mode || !fuel || distMiles <= 0 || pct <= 0) return;
+
+	    const tfactor = getTransportFactor(mode, size, fuel); // kg CO₂e per mile
+
+	    // Per-person emissions for this mode:
+	    const rowKg = (distMiles * tfactor * annualdays * 0.67 * pct) / shareCount;
+
+	    transportKg += rowKg;
+	});
+
+	  transportKg = +transportKg.toFixed(4);
       // ----------------------------------------------------
       // Electrical (use phase) – includes baseline lighting
       // ----------------------------------------------------
@@ -965,7 +1140,7 @@
         breakEven = +(embeddedKg / annualSaving).toFixed(2);
       }
 
-      if (breakEven <= 0) {
+      if (breakEven < 0) {
         breakEven = null;
       }
 
@@ -994,82 +1169,238 @@
         return `${v.toFixed(dp)} kg CO₂e`;
       };
 
-      const beText =
-        results.break_even_years == null ||
-        !isFinite(results.break_even_years) ||
-        results.break_even_years <= 0
-          ? "N/A"
-          : `${results.break_even_years.toFixed(1)} years`;
+	const beText =
+	  results.break_even_years == null ||
+	  !isFinite(results.break_even_years) ||
+	  results.break_even_years < 0 ||
+	  (results.break_even_years === 0 && annualSaving < 0)  
+		? "Carbon savings will not be made by teleworking"
+		: `${results.break_even_years.toFixed(1)} years`;
+
+
 
       const gridDisplay =
         results.assumptions &&
         typeof results.assumptions.grid_factor_kg_per_kwh === "number"
           ? `${results.assumptions.grid_factor_kg_per_kwh.toFixed(4)} kg CO₂e / kWh`
           : "n/a";
+		  
+	// Render a simple SVG line chart of cumulative net impact over time
+	// carbon(month) = embedded + monthlySavings * month
+	function renderImpactChart(results) {
+	  const container = document.getElementById("results-chart");
+	  if (!container) return;
 
-      // --- Render the styled "pro" results block ---
-      box.innerHTML = `
-        <div class="results-pro">
-          <div class="results-header-row">
-            <div>
-              <div class="results-title">
-                Teleworking impact summary
-                <span class="results-badge">model output</span>
-              </div>
-              <div class="results-subtitle">
-                All figures currently shown in kg CO₂e
-              </div>
-            </div>
-            <div class="results-total-block">
-              <div class="results-total-label">Net impact (first year)</div>
-              <div class="results-total-value">
-                ${fmtKg(results.total_kg, 1)}
-              </div>
-              <div class="results-total-tag">
-                includes transport, heating, electrical & embedded
-              </div>
-            </div>
+	  const embedded = Number(results.embedded_kg) || 0;
+
+	  // Annual saving vs baseline (positive = saving)
+	  const annualSaving =
+		(Number(results.transport_kg) || 0) -
+		(Number(results.heating_kg) || 0) -
+		(Number(results.electrical_kg) || 0);
+
+	  // Monthly change in carbon (negative = saving)
+	  const monthlySavings = -annualSaving / 12;
+
+	  const months = 24;
+	  const points = [];
+	  for (let m = 0; m <= months; m++) {
+		points.push({ x: m, y: embedded + monthlySavings * m });
+	  }
+
+	  // Y range
+	  let minY = Math.min(0, ...points.map((p) => p.y));
+	  let maxY = Math.max(0, ...points.map((p) => p.y));
+	  if (minY === maxY) maxY = minY + 1;
+
+	  // Round Y range to nearest 100s for nicer ticks
+	  const step = 100;
+	  let yStart = Math.floor(minY / step) * step;
+	  let yEnd   = Math.ceil(maxY / step) * step;
+	  if (yStart === yEnd) yEnd = yStart + step;
+
+	  const yTicks = [];
+	  for (let v = yStart; v <= yEnd; v += step) {
+		yTicks.push(v);
+	  }
+
+	  const width = 1000;
+	  const height = 300;
+	  const padding = {
+		left: 70,
+		right: 20,
+		top: 20,
+		bottom: 30
+	  };
+
+	  const innerW = width - padding.left - padding.right;
+	  const innerH = height - padding.top - padding.bottom;
+
+	  const scaleX = (m) => padding.left + (m / months) * innerW;
+	  const scaleY = (v) => padding.top + (yEnd - v) * (innerH / (yEnd - yStart));
+
+	  const pathData = points
+		.map((p, i) => `${i === 0 ? "M" : "L"}${scaleX(p.x)},${scaleY(p.y)}`)
+		.join(" ");
+
+	  const zeroY = scaleY(0);
+
+	  // X ticks: 0, 6, 12, 18, 24
+	  const xTicks = [0, 6, 12, 18, 24];
+
+	  const svg = `
+		<svg viewBox="0 0 ${width} ${height}"
+		width = "100%"
+		height ="200"
+		preserveAspectRatio="none">
+		  <defs>
+			<style>
+			  .axis { stroke: #9ca3af; stroke-width: 1; }
+			  .grid-line { stroke: #475569; stroke-width: 0.6; stroke-dasharray: 4 3; }
+			  .line { fill: none; stroke: #3b82f6; stroke-width: 2.5; }
+			  .zero-line { stroke: #10b981; stroke-width: 1; stroke-dasharray: 4 3; }
+			  .axis-label { fill: #cbd5e1; font-size: 12px; }
+			  .tick-label { fill: #cbd5e1; font-size: 11px; }
+			</style>
+		  </defs>
+
+		  <!-- Axes -->
+		  <line class="axis"
+			x1="${padding.left}" y1="${padding.top}"
+			x2="${padding.left}" y2="${height - padding.bottom}" />
+		  <line class="axis"
+			x1="${padding.left}" y1="${height - padding.bottom}"
+			x2="${width - padding.right}" y2="${height - padding.bottom}" />
+
+		  <!-- Zero line -->
+		  <line class="zero-line"
+			x1="${padding.left}" y1="${zeroY}"
+			x2="${width - padding.right}" y2="${zeroY}" />
+
+		  <!-- X ticks + grid -->
+		  ${xTicks
+			.map((m) => {
+			  const x = scaleX(m);
+			  return `
+				<line class="grid-line"
+				  x1="${x}" y1="${padding.top}"
+				  x2="${x}" y2="${height - padding.bottom}" />
+				<text class="tick-label"
+				  x="${x}" y="${height - padding.bottom + 18}"
+				  text-anchor="middle">${m}</text>
+			  `;
+			})
+			.join("")}
+
+		  <!-- Y ticks + grid -->
+		  ${yTicks
+			.map((v) => {
+			  const y = scaleY(v);
+			  return `
+				<line class="grid-line"
+				  x1="${padding.left}" y1="${y}"
+				  x2="${width - padding.right}" y2="${y}" />
+				<text class="tick-label"
+				  x="${padding.left - 8}" y="${y + 4}"
+				  text-anchor="end">${v}</text>
+			  `;
+			})
+			.join("")}
+
+		  <!-- Data line -->
+		  <path class="line" d="${pathData}" />
+
+		  <!-- Axis labels -->
+		  <text class="axis-label"
+			x="${width / 2 + 25}" 
+			y="${height}"
+			text-anchor="middle">
+			Time (months)
+		  </text>
+
+		  <!-- Y axis label -->
+		  <text class="axis-label"
+			  x="${padding.left + 10}"
+			  y="${padding.top + innerH / 2 + 60}"
+			  text-anchor="middle"
+			  transform="rotate(-90 ${padding.left - 50} ${padding.top + innerH / 2 + 60})">
+		    Cumulative net impact (kgCO₂e)
+		  </text>
+		</svg>
+	  `;
+
+	  container.innerHTML = svg;
+	}
+
+
+    // --- Render the styled results block ---
+    box.innerHTML = `
+      <div class="results">
+        <div class="results-header-row">
+          <div class="results-title">
+            Teleworking impact summary
           </div>
-
-          <div class="results-columns">
-            <div>
-              <div class="results-column-title">Operational emission changes (per year)</div>
+        </div>
+        <div class="results-main-row">
+          <!-- Left side: metrics stacked -->
+          <div class="results-left">
+            <div class="results-metrics-block">
+              <div class="results-column-title">Operational emission changes</div>
               <div class="results-metric">
                 <span class="results-metric-label">Transport</span>
-                <span class="results-metric-value">-${fmtKg(results.transport_kg)}</span>
+                <span class="results-metric-value">-${fmtKg(results.transport_kg)}/year</span>
               </div>
               <div class="results-metric">
                 <span class="results-metric-label">Heating</span>
-                <span class="results-metric-value">${fmtKg(results.heating_kg)}</span>
+                <span class="results-metric-value">${fmtKg(results.heating_kg)}/year</span>
               </div>
               <div class="results-metric">
                 <span class="results-metric-label">Electrical</span>
-                <span class="results-metric-value">${fmtKg(results.electrical_kg)}</span>
+                <span class="results-metric-value">${fmtKg(results.electrical_kg)}/year</span>
               </div>
-            </div>
-
-            <div>
-              <div class="results-column-title">Upfront & break-even</div>
               <div class="results-metric">
                 <span class="results-metric-label">Upfront embedded</span>
                 <span class="results-metric-value">${fmtKg(results.embedded_kg)}</span>
               </div>
               <div class="results-metric">
-                <span class="results-metric-label">Break-even time</span>
-                <span class="results-metric-value">${beText}</span>
+                <span class="results-title">Break-even time</span>
+                <span class="results-title">${beText}</span>
               </div>
             </div>
           </div>
 
-          <div class="results-footer-note">
-            Grid factor used for electrical calculations: ${gridDisplay}
+          <!-- Right side: chart -->
+          <div class="results-right">
+            <div class="results-title">
+              Net impact (first year):
+              <span id="net-impact" class="result-final">
+                ${fmtKg(results.total_kg, 1)}
+              </span>
+            </div>
+            <div class="results-chart" id="results-chart"></div>
           </div>
         </div>
-      `;
+      </div>
+     `;
 
-      // Optional: still log raw data to console for debugging
-      console.log("Calculation results:", results);
+    // draw the chart
+    renderImpactChart(results);
+
+    // colour the net impact value
+    const net = results.total_kg;
+    const el = document.getElementById("net-impact");
+    if (el) {
+      el.classList.remove("positive", "negative");
+      if (net > 0) {
+        el.classList.add("positive");
+      } else if (net < 0) {
+        el.classList.add("negative");
+      }
     }
+
+    console.log("Calculation results:", results);
+  }
+
 
     // --- Bootstrap function to wire up UI on DOM ready ---
     function init() {
@@ -1078,7 +1409,6 @@
 
       // Start with one row each
       addElectricalRow();
-      addEmbeddedRow();
 
       // Add row handlers
       document
