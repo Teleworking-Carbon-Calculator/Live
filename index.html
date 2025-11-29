@@ -279,11 +279,12 @@
 	}
 
     /* --- Disabled select state (used for transport/heating logic) --- */
-    select:disabled {
-      background: #e5e7eb;
-      color: #6b7280;
-      cursor: not-allowed;
-    }
+	select:disabled,
+	input:disabled {
+	  background: #ffe0e0;
+	  color: #6b7280;
+	  cursor: not-allowed;
+	}
 
     /* --- Small remove-row button for dynamic rows --- */
     .remove-row-btn {
