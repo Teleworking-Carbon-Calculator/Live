@@ -313,7 +313,57 @@
   </head>
 
   <body>
-    <h1>Telework Carbon Calculator</h1>
+  <h1> Carbon impacts of teleworking </h1>
+  <p> Teleworking (or working from home) is becoming an increasingly popular work style, often being promoted as a more environmental way of working as well
+	  promoting a more healthy work life ballence. However due to changes in heating and electrical usage patterns alongside additional equipment requirements
+	  these environmental benefits are far from assured. This website provides some best practice advice for anyone teleworking, and  a simple 
+	  calculator to estimate individual emissions under different scenarios. </p>
+  <!-- =========================================================
+     Teleworking best-practice tips (advice before calculator)
+     ========================================================= -->
+	<div class="card-row">
+	  <div class="card">
+		<h2>Heating: Best practice</h2>
+		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+		  <li><strong>Heat a single room:</strong> Only heating occupied rooms significantly reduces energy consumption.</li>
+		  <li><strong>Keep temperatures below 20C:</strong> Small temperature increases require far more energy</li>
+		  <li><strong>Telework when the house is already occupied:</strong> If someone else is at home already using the heating, teleworking on those days will not meaningfully incrase heating emissions</li>
+		  <li>If your heating emissions are too high, consider <strong>avoiding teleworking in winter months</strong>.</li>
+		</ul>
+	  </div>
+
+	  <div class="card">
+		<h2>Electrical: Best practice</h2>
+		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+		  <li><strong>Avoid use of air conditioning:</strong> Desk fans have low energy usage however if air conditioning is required consider working from a shared office.</li>
+		  <li><strong>Make use of natural light:</strong> Lighting demand is small but often not offset by office savings. </li>
+		  <li><strong>Consider switching to a renewable energy supplier:</strong> Renewable electricity has a far lower impact than the standard grid mix. </li>
+		</ul>
+	  </div>
+	</div>
+
+	<div class="card-row">
+	  <div class="card">
+		<h2>Transport: Best practice</h2>
+		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+		  <li><strong>Use active travel on office days:</strong> Active transport has a very low carbon impact compared to driving.</li>
+		  <li><strong>Avoid relocating further away from the office after switching to hybrid work:</strong> Teleworkers who relocate often have higher transport emissions even when making fewer trips.</li>
+		  <li>Carbon savings from teleworking are <strong> unlikely if you walk or wheel to work.</strong></li>
+		  <li><strong>High frequency teleworking (3-5days/week):</strong> maximises carbon savings from transport.</li>
+		</ul>
+	  </div>
+
+	  <div class="card">
+		<h2>Equipment: Best practice</h2>
+		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+		  <li><strong>Buy only what you need:</strong> a new 24" monitor has the equivilent carbon impact as 500miles driven in a petrol car</li>
+		  <li><strong>Prefer refurbished or second-hand:</strong> This eliminates the embedded carbon neccesary in manufacturing new equipment .</li>
+		  <li><strong>Share equipment between all workstations:</strong> Using the same laptop and peripheries in the home office and regular work prevents duplication of embedded carbon.</li>
+		</ul>
+	  </div>
+	</div>
+
+    <h2>Telework Carbon Calculator</h2>
     <p class="muted">
       This tool exists to estimate your relative carbon impacts from teleworking
       compared to regular office work. Its calculations are estimates and aim to
@@ -1254,7 +1304,27 @@
                 4
               )} kg CO₂e / kWh`
             : "n/a";
+			
+        /* -------------------------
+           Advice logic
+           ------------------------- */
+		const adviceRows = [];
 
+		if (results.heating_kg > results.transport_kg) {
+		  adviceRows.push({
+			label: "Heating",
+			text:
+			  "Heating emissions are large relative to transport emissions — consider working from the office in winter months."
+		  });
+		}
+		
+		if (results.break_even_years > 1) {
+		  adviceRows.push({
+			label: "Embedded",
+			text:
+			  "Embedded equipment emissions are large relative to carbon savings — consider reusing existing or refurbished equipment instead of buying new."
+		  });
+		}
         /* -----------------------------------------------------
            RESULTS CHART: cumulative net impact over 24 months
            carbon(month) = embedded + monthlySavings * month
@@ -1459,12 +1529,27 @@
                     <span class="results-title">${beText}</span>
                   </div>
                 </div>
+				
+				${adviceRows
+				  .map(
+				    (row) => `
+				<div class="results-metric">
+			      <span class="results-metric-label" style="color:#f97373; font-weight:600;">
+					Advice – ${row.label}
+				  </span>
+			      <span class="results-metric-value" style="color:#fecaca;">
+				    ${row.text}
+				  </span>
+				</div>
+				`
+				  )
+				  .join("")}
               </div>
-
+				
               <!-- Right side: chart + net impact headline -->
               <div class="results-right">
                 <div class="results-title">
-                  Net impact (first year):
+                  Change in carbon emissions within the first year of teleworking:
                   <span id="net-impact" class="result-final">
                     ${fmtKg(results.total_kg, 1)}
                   </span>
