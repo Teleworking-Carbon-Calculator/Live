@@ -1132,39 +1132,47 @@
 
         transportKg = +transportKg.toFixed(4);
 
-        /* -------------------------
-           Electrical (use phase)
-           - includes baseline lighting
-           ------------------------- */
-        const bRenewable = document.getElementById("b_renewable").checked;
-        const eContainers = document.querySelectorAll("#electrical-rows > .grid");
+		/* -------------------------
+		   Electrical (use phase)
+		   - includes baseline lighting
+		   ------------------------- */
+		const bRenewable = document.getElementById("b_renewable").checked;
+		const eContainers = document.querySelectorAll("#electrical-rows > .grid");
 
-        // Base lighting usage
-        let totalKwh = 17 * (bdays / 5);
+		// Base lighting usage
+		let totalKwh = 17 * (bdays / 5);
 
-        eContainers.forEach((wrap) => {
-          const itemSel = wrap.querySelector('[data-type="e-item"]');
-          const hoursInput = wrap.querySelector('[data-type="e-hours"]');
-          const monthsInput = wrap.querySelector('[data-type="e-months"]');
-          if (!itemSel || !hoursInput || !monthsInput) return;
+		eContainers.forEach((wrap) => {
+		  const itemSel = wrap.querySelector('[data-type="e-item"]');
+		  const hoursInput = wrap.querySelector('[data-type="e-hours"]');
+		  const monthsInput = wrap.querySelector('[data-type="e-months"]');
+		  if (!itemSel || !hoursInput || !monthsInput) return;
 
-          const item = itemSel.value.toLowerCase();
-          const hours = Number(hoursInput.value || 0);
-          const days = (Number(monthsInput.value || 0) * bdays * 220)/60;
-          const watt = ELECTRICAL_WATTS[item] || 0;
-          const kwh = (watt * hours * days) / 1000.0;
+		  const item = itemSel.value.toLowerCase();
+		  const hours = Number(hoursInput.value || 0);
+		  const days = (Number(monthsInput.value || 0) * 220) / 60;
 
-          totalKwh += kwh;
-        });
+		  // Base wattage from lookup table
+		  let watt = ELECTRICAL_WATTS[item] || 0;
 
-        let gridFactor = GRID_CO2E_PER_KWH;
+		  // If there is NO renewable contract, force laptops/desktops/monitors to 1 W
+		  const lowWattItems = ["laptop", "desktop", "monitor"];
+		  if (!bRenewable && lowWattItems.includes(item)) {
+			watt = 1;
+		  }
 
-        // NOTE: deliberately a delta vs baseline (renewables vs non-renewables)
-        if (bRenewable) {
-          gridFactor = 0.0167 - GRID_CO2E_PER_KWH;
-        }
+		  const kwh = (watt * hours * days) / 1000.0;
+		  totalKwh += kwh;
+		});
 
-        const electricalKg = +(totalKwh * gridFactor).toFixed(4);
+		let gridFactor = GRID_CO2E_PER_KWH;
+
+		// NOTE: deliberately a delta vs baseline (renewables vs non-renewables)
+		if (bRenewable) {
+		  gridFactor = 0.0167 - GRID_CO2E_PER_KWH;
+		}
+
+		const electricalKg = +(totalKwh * gridFactor).toFixed(4);
 
         /* -------------------------
            Heating – teleworking-driven extra demand
@@ -1314,7 +1322,7 @@
 		  adviceRows.push({
 			label: "Heating",
 			text:
-			  "Heating emissions are large relative to transport emissions — consider working from the office in winter months."
+			  "Heating emissions are large relative to transport emissions, consider working from the office in winter months."
 		  });
 		}
 		
@@ -1322,7 +1330,7 @@
 		  adviceRows.push({
 			label: "Embedded",
 			text:
-			  "Embedded equipment emissions are large relative to carbon savings — consider reusing existing or refurbished equipment instead of buying new."
+			  "Embedded equipment emissions are large relative to carbon savings, consider reusing existing or refurbished equipment instead of buying new."
 		  });
 		}
         /* -----------------------------------------------------
@@ -1535,9 +1543,9 @@
 				    (row) => `
 				<div class="results-metric">
 			      <span class="results-metric-label" style="color:#f97373; font-weight:600;">
-					Advice – ${row.label}
+					${row.label} guidance:
 				  </span>
-			      <span class="results-metric-value" style="color:#fecaca;">
+			      <span class="results-metric-value" style="color:#f97373;">
 				    ${row.text}
 				  </span>
 				</div>
