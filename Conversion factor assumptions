@@ -1,0 +1,75 @@
+Backend Carbon Conversion Factors
+Transport (kgCO2e/mile)
+Source: UK Government GHG Conversion Factors (DESNZ, 2024), standard represents weighted average emissions for an unknown fuel type.
+Mode	Vehicle Size	Diesel	Petrol	Hybrid	Plug-in Hybrid	Battery Electric	Standard
+Car	Small	0.22522	0.23126	0.18143	0.09782	0.06894	0.22824
+Car	Medium	0.27050	0.28526	0.18492	0.14983	0.07442	0.27788
+Car	Large	0.33362	0.43267	0.24921	0.19191	0.07925	0.38315
+Car	Average	0.27334	0.26473	0.20288	0.17465	0.07635	0.26904
+Motorbike	Small	–	–	–	–	–	0.13389
+Motorbike	Medium	–	–	–	–	–	0.16265
+Motorbike	Large	–	–	–	–	–	0.21326
+Motorbike	Average	–	–	–	–	–	0.18293
+Electric Bicycle	–	–	–	–	–	–	0.00402
+Bicycle	–	–	–	–	–	–	0.00000
+Bus	–	–	–	–	–	–	0.17467
+Rail	–	–	–	–	–	–	0.05706
+Walking	–	–	–	–	–	–	0.00000
+
+Heating Energy Factors (kWh)
+Source: Shi et al. (2023)
+https://www.sciencedirect.com/science/article/pii/S0378778823002268#s0055
+Extra Heating Hours per Day	Temperature (°C)	One Office Room	Rest of Property
+1	19	749	1,897
+1	20	837	2,130
+1	21	925	2,368
+2	19	989	2,525
+2	20	1,102	2,827
+2	21	1,215	3,134
+3	19	1,223	3,138
+3	20	1,360	3,506
+3	21	1,498	3,880
+
+Heating carbon factors (kgCO2e/kWh)
+Source: UK Government GHG Conversion Factors (DESNZ, 2024)
+Heating Fuel / Technology	Emission Factor (kgCO₂e/kWh)
+Unknown / Average	0.20835
+Wood (Biomass)	0.01132
+Natural Gas	0.20440
+LPG	0.23031
+Oil	0.25975
+Coal	0.36549
+Electric Radiator	0.22535
+Electric Heat Pump	0.00000
+
+Electrical Power Demand
+Equipment	Power Demand (W)
+Laptop	140
+Desktop Computer	200
+Monitor	33
+Desk Fan	33
+Portable Heater	1,500
+Desk Lamp	40
+
+Embedded Carbon
+Source: Manufacturer LCAs excluding operational impact.
+Equipment	Embedded Carbon (kgCO₂e)
+27″ Monitor	146.3
+24″ Monitor	99.0
+Smaller Monitor	66.19
+Desktop Computer	140.1
+Laptop	128.0
+Desktop (High Performance)	1,076.0
+Laptop (High Performance)	359.44
+Docking Station	38.03
+Keyboard	14.49
+Mouse	5.51
+Headset	5.77
+Webcam	5.43
+USB Drive / DVD	1.77
+Office Desk	78.0
+Office Chair	74.0
+Footrest	8.2
+Keyboard Rest	1.4
+Visualiser	184.0
+
