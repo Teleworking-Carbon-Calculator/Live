@@ -1,0 +1,113 @@
+5.1 Working pattern assumptions
+The model assumes that a full-time employee works 220 days per year, consistent with typical University of Exeter working patterns after accounting for holidays and leave. Teleworking days per year are derived from user-specified teleworking days per week:
+N_ty=220×N_tw/5
+Where: 
+	Nty = teleworking days per year.
+	Ntw = teleworking days per week.
+If the user does not telework in winter, heating-related teleworking days are reduced by half.
+5.2 Transport Data and Assumptions
+Carbon Conversion Factors
+Transport emission factors are taken from the UK Government’s Greenhouse Gas Conversion Factors for Company Reporting (2024) in kgCO2e/mile. This data is stored in lookup arrays within the tool and retrieved based on mode fuel and size inputs from the user.
+User Behaviour and Mode Split
+For each transport row the user specifies the commute distance, percentage frequency and vehicle occupancy. The calculator does not calculate and gives a warning if the percentage frequencies do not sum to 100% to prevent unrealistic results.
+
+Calculation assumptions
+It is assumed two commutes are made per day based on a return trip:
+D_d=D_t×2
+Where:
+	Dd = distance per day (miles) 
+	Dt = distance per trip (miles)
+Annual carbon reduction per transport mode are:
+〖∆TCO2〗_a=(D_d×〖Cf〗_a×N_ty×Rf×〖U%〗_a)/〖Np〗_a   
+Where:
+	〖∆TCO2〗_a = annual transport emissions reduction from row a (KgCO2e)
+	Cfa  =  emission factor for transport mode a (KgCO2e/mile)
+	Rf = rebound factor accounting for rebound effects
+	U%a = percentage of commuting with mode a
+	Npa = number of passengers (adjustment for car-sharing)
+A rebound factor Rf is applied to reflect behavioural changes limiting savings whilst teleworking (section 2.2). This value is modelled as 0.67 (Rerat 2019 ).
+Transport impact:
+〖∆TCO2〗_T=-∑_i▒〖∆TCO2〗_i 
+This is expressed as a negative quantity, representing avoided emissions. 
+A monthly value is derived as:
+〖∆TCO2〗_M=〖∆TCO2〗_T/12
+Key limitations of transport calculations:
+	Emission intensities are national averages and do not account for regional variation (i.e. in bus/rail occupancy).
+	Only use phase emissions are accounted for, manufacture and disposal of vehicles are not assessed.
+	Rebound impacts are greatly simplified and may not reflect actual mobility patterns.
+5.3 Heating Data and Assumptions
+Heating Energy Dataset:
+Domestic heating energy demand is sourced from Shi et al, (2023) who calculated average annual energy consumption for a range of heating temperatures (19–21°C), daily durations, and floor areas. These values are based on UK residential building models and were used to approximate the heating demand in kWh whilst teleworking. These results are stored in a lookup array in [SCRIPT BLOCK 1] and are selected based on temperature, area and duration inputs from the user.
+Heating Energy Dataset:
+Carbon intensity for each heating type is sourced from the government’s greenhouse gas conversion factors (2024), except for electric heating. If the user has a renewable electricity supplier, the carbon intensity is equal to the renewable energy tariff intensity. Else the carbon intensity is equal to the grid carbon intensity.
+Heating energy due to teleworking:
+HE_T=HE_A×N_tw/5
+Where:
+HE_T= total heating energy attributable to teleworking (kWh)
+HE_A= annual heating energy for a full-time teleworker (kWh)
+
+Heating emissions due to teleworking:
+ΔHCO2_T=HE_T×Cf
+ΔHCO2_M=(ΔHCO2_T)/12
+Occupancy and Winter Teleworking:
+Heating emissions are set to zero under any of the following conditions:
+	The user does not intend to telework in winter months.
+	The property is already occupied in the working day; therefore, additional heating demand is negligible.
+	The heating system is a heat pump; these are assumed to run continuously with minimal occupancy-based scheduling.
+Key limitations of heating calculation:
+	The model uses national averages for heating energy demand, building efficiency, heating mode efficiency and grid carbon factor. These factors vary regionally and temporarily, limiting the accuracy of the estimation.
+	The module only accounts for typical heating systems in the UK, therefore it cannot calculate heating impacts for more obscure heating systems such as community heat schemes or waste energy heating.
+	This calculation assumes no heating savings will be made in the office which, whilst likely true in shared workspaces, is unrealistic in private offices or buildings with a high uptake of teleworkers.
+5.4 Electrical Data and Assumptions
+Lighting energy:
+Electrical emissions are assigned to lighting and home-office devices. With a full-time teleworker having an average lighting energy requirement of 17kWh sourced from the Ecocat whitepaper (2020). Specific lighting requirements are then calculated from this value.
+El= E_lF×  N_tw/5
+Where:
+	El= Annual lighting energy (kWh)
+	ElF = Annual lighting energy for a full-time teleworker (kWh).
+Device energy:
+Typical device wattages (laptops, desktops, monitors, fans etc…) are taken from manufacturer specifications and stored in a lookup table ([SCRIPT BLOCK 1: DATA]). For each device the user defines the hours per day and months per year the device is used for.
+Days of annual use:
+N_tya=N_ty×  (m )/12  
+Where: 
+	Ntya= days device a is used per year
+	m = months device a is used per year.
+Renewable Tariff Adjustment:
+If the user does not have a renewable electricity contract the calculator assumes additional use of standard office equipment (laptop, monitor etc..) is offset by reduced plug loading in the office. Therefore, these devices are assigned an idle wattage of 1W to account for idle plug loading at the university.
+If domestic electricity is provided from a renewable source device wattage is not reassigned and instead the electrical carbon factor is assigned the difference between renewable carbon factor and the grid carbon factor. This will be a negative value and represents a displacement of an energy mix containing fossil fuels in favour of cleaner renewable generation.
+Device Energy:
+〖ED〗_a=(N_tya× P_a×h_a)/1000
+
+E_T=El+∑_i▒〖ED〗_i 
+Where:
+	〖ED〗_a= annual energy consumption of device a
+	P_a= device power (W)
+	h_a= hours per day device ais used
+	ET = total annual electrical consumption
+Electrical impact:
+ΔECO2_T=E_T×Cf
+ΔECO2_M=(ΔECO2_T)/12
+Key limitations of electrical calculations:
+	Electrical consumption for personal devices assumes constant power draw during use, which may differ from real-world dynamic loads.
+	Renewable electricity assumptions rely on supplier declarations rather than direct grid measuring.
+	Teleworkers may use non-work domestic appliances at a higher frequency (i.e. microwave, radio etc…) these are not accounted for.
+5.5 Embedded Data and Assumptions
+Embedded emissions account for the one-off carbon cost of manufacturing additional equipment required for teleworking. These are based on average life cycle assessments and do not account for the use phase emissions from the items, as this is being counted in electrical impacts. The user inputs the item of equipment as well as the quantity and if they are sourced new/refurbished. 
+
+
+
+Embedded impact:
+If an item is second-hand or refurbished its embedded carbon is assumed to be zero, otherwise embedded carbon for each input row is calculated as.
+〖EM〗_a=〖CO2〗_a×〖Count〗_a
+Where:
+	CO2_a= embedded carbon of item a
+	Count_a= number of units
+Total embedded emissions:
+EMCO2_T=∑_i▒〖EM_i 〗
+5.6 Cumulative impact and break-even assumptions:
+The total first-year emission change is:
+〖∆C02〗_Y1=〖EMCO2〗_T+〖∆ECO2〗_T+〖∆HCO2〗_T+〖∆TCO2〗_T
+
+Cumulative impact (as plotted in the results chart) is modelled linearly
+∆C02=(〖∆ECO2〗_M+〖∆HCO2〗_M+〖∆TCO2〗_M )×months+〖EMCO2〗_T
+This value represents the minimum length someone must telework to achieve any hypothetical carbon savings. If the slope value is positive this means carbon savings cannot be made by teleworking, therefore there is no break-even period.
