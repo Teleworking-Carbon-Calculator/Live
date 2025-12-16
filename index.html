@@ -299,6 +299,20 @@
         height: 300px;
         display: block;
       }
+	  
+	  .results-chart-explain {
+	    margin-top: 0.6rem;
+	    padding: 0.6rem 0.75rem;
+	    border-radius: 10px;
+	    background: rgba(148, 163, 184, 0.12);
+	    color: #cbd5e1;
+    	font-size: 0.82rem;
+	    line-height: 1.35;
+	  }
+
+	  .results-chart-explain strong {
+	    color: #e5e7eb;
+	  }
 
       /* =========================================================
          DISABLED STYLING
@@ -314,9 +328,9 @@
 
   <body>
   <h1> Carbon impacts of homeworking </h1>
-  <p> Homeworking (or working from home) is becoming an increasingly popular work style, often being promoted as a more environmental way of working as well
-	  promoting a more healthy work life ballence. However due to changes in heating and electrical usage patterns alongside additional equipment requirements
-	  these environmental benefits are far from assured. This website provides some best practice advice for anyone homeworking, and  a simple 
+  <p> Homeworking (or working from home) is becoming an increasingly popular work style, promoted for presumed environmental benefits and
+	  a better work life balance. However due to changes in heating and electrical usage patterns alongside additional equipment requirements,
+	  these environmental benefits are far from assured. This website provides some best practice advice for anyone homeworking, and a simple 
 	  calculator to estimate individual emissions under different scenarios. </p>
   <!-- =========================================================
      Homeworking best-practice tips (advice before calculator)
@@ -326,8 +340,8 @@
 		<h2>Heating: Best practice</h2>
 		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
 		  <li><strong>Heat a single room:</strong> Only heating occupied rooms significantly reduces energy consumption.</li>
-		  <li><strong>Keep temperatures below 20C:</strong> Small temperature increases require far more energy.</li>
-		  <li><strong>Telework when the house is already occupied:</strong> If someone else is at home already using the heating, homeworking on those days will not meaningfully incrase heating emissions.</li>
+		  <li><strong>Keep temperatures below 20°C:</strong> Small temperature increases require far more energy.</li>
+		  <li><strong>Telework when the house is already occupied:</strong> If someone else is at home already using the heating, homeworking on those days will not meaningfully increase heating emissions.</li>
 		  <li>If your heating emissions are too high, consider <strong>avoiding homeworking in winter months</strong>.</li>
 		</ul>
 	  </div>
@@ -356,8 +370,8 @@
 	  <div class="card">
 		<h2>Equipment: Best practice</h2>
 		<ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
-		  <li><strong>Buy only what you need:</strong> a new 24" monitor has the equivilent carbon impact as 500miles driven in a petrol car.</li>
-		  <li><strong>Prefer refurbished or second-hand:</strong> This eliminates the embedded carbon neccesary in manufacturing new equipment.</li>
+		  <li><strong>Buy only what you need:</strong> a new 24" monitor has the equivalent carbon impact as 500 miles driven in a petrol car.</li>
+		  <li><strong>Prefer refurbished or second-hand:</strong> This eliminates the embedded carbon necessary in manufacturing new equipment.</li>
 		  <li><strong>Share equipment between all workstations:</strong> Using the same laptop and peripheries in the home office and regular work prevents duplication of embedded carbon.</li>
 		</ul>
 	  </div>
@@ -608,18 +622,18 @@
         { Equipment: "Smaller Monitor", "Footprint(CO2e)": 66.19 },
         { Equipment: "Desktop", "Footprint(CO2e)": 140.1 },
         { Equipment: "Laptop", "Footprint(CO2e)": 128 },
-        { Equipment: "Desktop (High Performanc)", "Footprint(CO2e)": 1076 },
+        { Equipment: "Desktop (High Performance)", "Footprint(CO2e)": 1076 },
         { Equipment: "Laptop (High Performance)", "Footprint(CO2e)": 359.44 },
         { Equipment: "Docking Station", "Footprint(CO2e)": 38.03 },
         { Equipment: "Keyboard", "Footprint(CO2e)": 14.49 },
         { Equipment: "Mouse", "Footprint(CO2e)": 5.51 },
         { Equipment: "Headset", "Footprint(CO2e)": 5.77 },
         { Equipment: "Webcam", "Footprint(CO2e)": 5.43 },
-        { Equipment: "USB Drove/DVD", "Footprint(CO2e)": 1.77 },
+        { Equipment: "USB Drive/DVD", "Footprint(CO2e)": 1.77 },
         { Equipment: "Office Desk", "Footprint(CO2e)": 78 },
         { Equipment: "Office Chair", "Footprint(CO2e)": 74 },
         { Equipment: "Footrest", "Footprint(CO2e)": 8.2 },
-        { Equipment: "Keyboard rest (High Performanc)", "Footprint(CO2e)": 1.4 },
+        { Equipment: "Keyboard rest", "Footprint(CO2e)": 1.4 },
         { Equipment: "Visualiser", "Footprint(CO2e)": 184 }
       ];
     </script>
@@ -946,7 +960,7 @@
             <input type="number" data-type="em-count" min="0" step="1" value="1">
           </div>
           <div>
-            <label>Second hand/referbished</label>
+            <label>Second hand/refurbished</label>
             <label style="display:flex; align-items:center; gap:0.35rem; font-weight:400;">
               <input type="checkbox" data-type="em-secondhand">
             </label>
@@ -1546,6 +1560,8 @@
 			      <span class="results-metric-label" style="color:#f97373; font-weight:600;">
 					${row.label} guidance:
 				  </span>
+				</div>
+				<div>  
 			      <span class="results-metric-value" style="color:#f97373;">
 				    ${row.text}
 				  </span>
@@ -1564,6 +1580,7 @@
                   </span>
                 </div>
                 <div class="results-chart" id="results-chart"></div>
+				<div class="results-chart-explain" id="results-chart-explain"></div>
               </div>
             </div>
           </div>
@@ -1571,6 +1588,26 @@
 
         // Draw the SVG chart
         renderImpactChart(results);
+		
+		// Chart explanation text
+		const explainEl = document.getElementById("results-chart-explain");
+		
+		if (explainEl) {
+		  const annualSaving =
+			(Number(results.transport_kg) || 0) -
+			(Number(results.heating_kg) || 0) -
+			(Number(results.electrical_kg) || 0);
+
+		  const monthlyDelta = (-annualSaving / 12); // chart uses embedded + monthlyDelta * month
+
+		  explainEl.innerHTML = `
+			The line plots your <strong>cumulative net carbon impact</strong> from homeworking over <strong>24 months</strong>.
+			Values <strong>below 0</strong> represent net carbon <strong>savings</strong> compared to commuting; values <strong>above 0</strong> mean a net <strong>increase</strong>.
+			The dashed green line is the <strong>break-even</strong> point at 0.
+			<br><br>
+			<span class="results-metric-muted">Estimated monthly net change: ${monthlyDelta.toFixed(1)} kg CO₂e / month.</span>
+		  `;
+}
 
         // Colour the net impact value (red for positive, green for negative)
         const net = results.total_kg;
