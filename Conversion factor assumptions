@@ -1,46 +1,44 @@
 Backend Carbon Conversion Factors
 Transport (kgCO2e/mile)
 Source: UK Government GHG Conversion Factors (DESNZ, 2024), standard represents weighted average emissions for an unknown fuel type.
-Mode	Vehicle Size	Diesel	Petrol	Hybrid	Plug-in Hybrid	Battery Electric	Standard
-Car	Small	0.22522	0.23126	0.18143	0.09782	0.06894	0.22824
-Car	Medium	0.27050	0.28526	0.18492	0.14983	0.07442	0.27788
-Car	Large	0.33362	0.43267	0.24921	0.19191	0.07925	0.38315
-Car	Average	0.27334	0.26473	0.20288	0.17465	0.07635	0.26904
-Motorbike	Small	–	–	–	–	–	0.13389
-Motorbike	Medium	–	–	–	–	–	0.16265
-Motorbike	Large	–	–	–	–	–	0.21326
-Motorbike	Average	–	–	–	–	–	0.18293
-Electric Bicycle	–	–	–	–	–	–	0.00402
-Bicycle	–	–	–	–	–	–	0.00000
-Bus	–	–	–	–	–	–	0.17467
-Rail	–	–	–	–	–	–	0.05706
-Walking	–	–	–	–	–	–	0.00000
+        { Mode: "Car", Size: "Small", Diesel: 0.22522, Petrol: 0.23126, Hybrid: 0.18143, PluginHybrid: 0.09782, BatteryElectric: 0.06894, Standard: 0.22824 },	
+        { Mode: "Car", Size: "Medium", Diesel: 0.2705, Petrol: 0.28526, Hybrid: 0.18492, PluginHybrid: 0.14983, BatteryElectric: 0.07442, Standard: 0.27788 },
+        { Mode: "Car", Size: "Large", Diesel: 0.33362, Petrol: 0.43267, Hybrid: 0.24921, PluginHybrid: 0.19191, BatteryElectric: 0.07925, Standard: 0.383145 },
+        { Mode: "Car", Size: "Average", Diesel: 0.27334, Petrol: 0.26473, Hybrid: 0.20288, PluginHybrid: 0.17465, BatteryElectric: 0.07635, Standard: 0.269035 },
+        { Mode: "Motorbike", Size: "Small", Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.13389 },
+        { Mode: "Motorbike", Size: "Medium", Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.16265 },
+        { Mode: "Motorbike", Size: "Large", Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.21326 },
+        { Mode: "Motorbike", Size: "Average", Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.18293 },
+        { Mode: "Electric Bicycle", Size: null, Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.0040225 },
+        { Mode: "Bicycle", Size: null, Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.0 },
+        { Mode: "Bus", Size: null, Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.17467304 },
+        { Mode: "Rail", Size: null, Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.05705514 },
+        { Mode: "Walking", Size: null, Diesel: null, Petrol: null, Hybrid: null, PluginHybrid: null, BatteryElectric: null, Standard: 0.0 }
 
 Heating Energy Factors (kWh)
 Source: Shi et al. (2023)
 https://www.sciencedirect.com/science/article/pii/S0378778823002268#s0055
-Extra Heating Hours per Day	Temperature (°C)	One Office Room	Rest of Property
-1	19	749	1,897
-1	20	837	2,130
-1	21	925	2,368
-2	19	989	2,525
-2	20	1,102	2,827
-2	21	1,215	3,134
-3	19	1,223	3,138
-3	20	1,360	3,506
-3	21	1,498	3,880
+        { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749, "Heating the rest of property (kWh/year/person)": 1897 }, <!--Data taken from shi et al. available at https://www.sciencedirect.com/science/article/pii/S0378778823002268#s0055 -->
+        { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837, "Heating the rest of property (kWh/year/person)": 2130 },
+        { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925, "Heating the rest of property (kWh/year/person)": 2368 },
+        { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989, "Heating the rest of property (kWh/year/person)": 2525 },
+        { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, "Heating the rest of property (kWh/year/person)": 2827 },
+        { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, "Heating the rest of property (kWh/year/person)": 3134 },
+        { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, "Heating the rest of property (kWh/year/person)": 3138 },
+        { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, "Heating the rest of property (kWh/year/person)": 3506 },
+        { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, "Heating the rest of property (kWh/year/person)": 3880 }
 
 Heating carbon factors (kgCO2e/kWh)
 Source: UK Government GHG Conversion Factors (DESNZ, 2024)
 Heating Fuel / Technology	Emission Factor (kgCO₂e/kWh)
-Unknown / Average	0.20835
-Wood (Biomass)	0.01132
-Natural Gas	0.20440
-LPG	0.23031
-Oil	0.25975
-Coal	0.36549
-Electric Radiator	0.22535
-Electric Heat Pump	0.00000
+        { Fuel: "Unknown (Average)", "CO2e/kwh": 0.20835054 },
+        { Fuel: "Wood", "CO2e/kwh": 0.01132 },
+        { Fuel: "Gas", "CO2e/kwh": 0.2044 },
+        { Fuel: "LPG", "CO2e/kwh": 0.23031 },
+        { Fuel: "Oil", "CO2e/kwh": 0.25975 },
+        { Fuel: "Coal", "CO2e/kwh": 0.36549 },
+        { Fuel: "Electric Radiator", "CO2e/kwh": 0.22535 },
+        { Fuel: "Electric Heat Pump", "CO2e/kwh": 0.0 }
 
 Electrical Power Demand
 Equipment	Power Demand (W)
