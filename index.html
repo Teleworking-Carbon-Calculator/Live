@@ -569,7 +569,7 @@
          ========================================================= -->
     <script>
       const TRANSPORT_DATA = [
-        { Mode: "Car", Size: "Small", Diesel: 0.22522, Petrol: 0.23126, Hybrid: 0.18143, PluginHybrid: 0.09782, BatteryElectric: 0.06894, Standard: 0.22824 },	<!--DATA taken from 2024 GHG conversion factors. Standard data average of petrol and diesel -->
+        { Mode: "Car", Size: "Small", Diesel: 0.22522, Petrol: 0.23126, Hybrid: 0.18143, PluginHybrid: 0.09782, BatteryElectric: 0.06894, Standard: 0.22824 },	//DATA taken from 2024 GHG conversion factors. Standard data average of petrol and diesel//
         { Mode: "Car", Size: "Medium", Diesel: 0.2705, Petrol: 0.28526, Hybrid: 0.18492, PluginHybrid: 0.14983, BatteryElectric: 0.07442, Standard: 0.27788 },
         { Mode: "Car", Size: "Large", Diesel: 0.33362, Petrol: 0.43267, Hybrid: 0.24921, PluginHybrid: 0.19191, BatteryElectric: 0.07925, Standard: 0.383145 },
         { Mode: "Car", Size: "Average", Diesel: 0.27334, Petrol: 0.26473, Hybrid: 0.20288, PluginHybrid: 0.17465, BatteryElectric: 0.07635, Standard: 0.269035 },
@@ -592,7 +592,7 @@
         { Fuel: "Oil", "CO2e/kwh": 0.25975 },
         { Fuel: "Coal", "CO2e/kwh": 0.36549 },
         { Fuel: "Electric Radiator", "CO2e/kwh": 0.22535 },
-        { Fuel: "Electric Heat Pump", "CO2e/kwh": 0.0 }
+        { Fuel: "Electric Heat Pump", "CO2e/kwh": 0.0 }			// Value at zero as heat pumps do not change energy usage based on occupancy //
       ];
 
      const HEATING_DATA = [
@@ -1171,7 +1171,7 @@
           const tfactor = getTransportFactor(mode, size, fuel); // kg CO₂e per mile
 
           // Per-person emissions for this mode:
-          const rowKg = (distMiles * tfactor * annualdays * 0.67 * pct) / shareCount;
+          const rowKg = (distMiles * tfactor * annualdays * 0.67 * pct) / shareCount;	//0.67 scale factor is used to estimate the savings reduction due to rebound effects
           transportKg += rowKg;
         });
 
@@ -1200,7 +1200,7 @@
 		  // Base wattage from lookup table
 		  let watt = ELECTRICAL_WATTS[item] || 0;
 
-		  // If there is NO renewable contract, force laptops/desktops/monitors to 1 W
+		  // If there is NO renewable contract, force laptops/desktops/monitors to 1 W to account for reduced loading in the office estimating idle load of devices instead
 		  const lowWattItems = ["laptop", "desktop", "monitor"];
 		  if (!bRenewable && lowWattItems.includes(item)) {
 			watt = 1;
@@ -1718,5 +1718,6 @@
     </script>
   </body>
 </html>
+
 
 
