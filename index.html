@@ -595,17 +595,47 @@
         { Fuel: "Electric Heat Pump", "CO2e/kwh": 0.0 }
       ];
 
-      const HEATING_DATA = [
-        { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749, "Heating the rest of property (kWh/year/person)": 1897 }, <!--Data taken from shi et al. available at https://www.sciencedirect.com/science/article/pii/S0378778823002268#s0055 -->
-        { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837, "Heating the rest of property (kWh/year/person)": 2130 },
-        { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925, "Heating the rest of property (kWh/year/person)": 2368 },
-        { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989, "Heating the rest of property (kWh/year/person)": 2525 },
-        { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, "Heating the rest of property (kWh/year/person)": 2827 },
-        { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, "Heating the rest of property (kWh/year/person)": 3134 },
-        { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, "Heating the rest of property (kWh/year/person)": 3138 },
-        { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, "Heating the rest of property (kWh/year/person)": 3506 },
-        { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, "Heating the rest of property (kWh/year/person)": 3880 }
-      ];
+     const HEATING_DATA = [
+	  // Extra hours/day = 1
+  	  { "Extra hours/day": 1, "Required temperature (°C)": 15, "Heating one office room (kWh/year/person)": 397,  "Heating the rest of property (kWh/year/person)": 955 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 16, "Heating one office room (kWh/year/person)": 485,  "Heating the rest of property (kWh/year/person)": 1190.5 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 17, "Heating one office room (kWh/year/person)": 573,  "Heating the rest of property (kWh/year/person)": 1426 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 18, "Heating one office room (kWh/year/person)": 661,  "Heating the rest of property (kWh/year/person)": 1661.5 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 749,  "Heating the rest of property (kWh/year/person)": 1897 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 837,  "Heating the rest of property (kWh/year/person)": 2130 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 925,  "Heating the rest of property (kWh/year/person)": 2368 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 22, "Heating one office room (kWh/year/person)": 1013, "Heating the rest of property (kWh/year/person)": 2603.5 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 23, "Heating one office room (kWh/year/person)": 1101, "Heating the rest of property (kWh/year/person)": 2603.5 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 24, "Heating one office room (kWh/year/person)": 1189, "Heating the rest of property (kWh/year/person)": 2603.5 },
+	  { "Extra hours/day": 1, "Required temperature (°C)": 25, "Heating one office room (kWh/year/person)": 1277, "Heating the rest of property (kWh/year/person)": 2603.5 },
+	
+	  // Extra hours/day = 2
+	  { "Extra hours/day": 2, "Required temperature (°C)": 15, "Heating one office room (kWh/year/person)": 537,  "Heating the rest of property (kWh/year/person)": 1711 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 16, "Heating one office room (kWh/year/person)": 650,  "Heating the rest of property (kWh/year/person)": 1914.5 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 17, "Heating one office room (kWh/year/person)": 763,  "Heating the rest of property (kWh/year/person)": 2118 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 18, "Heating one office room (kWh/year/person)": 876,  "Heating the rest of property (kWh/year/person)": 2321.5 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 989,  "Heating the rest of property (kWh/year/person)": 2525 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1102, "Heating the rest of property (kWh/year/person)": 2827 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1215, "Heating the rest of property (kWh/year/person)": 3134 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 22, "Heating one office room (kWh/year/person)": 1328, "Heating the rest of property (kWh/year/person)": 3438.5 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 23, "Heating one office room (kWh/year/person)": 1441, "Heating the rest of property (kWh/year/person)": 3743 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 24, "Heating one office room (kWh/year/person)": 1554, "Heating the rest of property (kWh/year/person)": 4047.5 },
+	  { "Extra hours/day": 2, "Required temperature (°C)": 25, "Heating one office room (kWh/year/person)": 1667, "Heating the rest of property (kWh/year/person)": 4352 },
+	
+	  // Extra hours/day = 3
+	  { "Extra hours/day": 3, "Required temperature (°C)": 15, "Heating one office room (kWh/year/person)": 675,  "Heating the rest of property (kWh/year/person)": 1654 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 16, "Heating one office room (kWh/year/person)": 812,  "Heating the rest of property (kWh/year/person)": 2025 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 17, "Heating one office room (kWh/year/person)": 949,  "Heating the rest of property (kWh/year/person)": 2396 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 18, "Heating one office room (kWh/year/person)": 1086, "Heating the rest of property (kWh/year/person)": 2767 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 19, "Heating one office room (kWh/year/person)": 1223, "Heating the rest of property (kWh/year/person)": 3138 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 20, "Heating one office room (kWh/year/person)": 1360, "Heating the rest of property (kWh/year/person)": 3506 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 21, "Heating one office room (kWh/year/person)": 1498, "Heating the rest of property (kWh/year/person)": 3880 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 22, "Heating one office room (kWh/year/person)": 1635, "Heating the rest of property (kWh/year/person)": 4251 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 23, "Heating one office room (kWh/year/person)": 1772, "Heating the rest of property (kWh/year/person)": 4622 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 24, "Heating one office room (kWh/year/person)": 1909, "Heating the rest of property (kWh/year/person)": 4993 },
+	  { "Extra hours/day": 3, "Required temperature (°C)": 25, "Heating one office room (kWh/year/person)": 2046, "Heating the rest of property (kWh/year/person)": 5364 }
+	];
+
 
       const ELECTRICAL_DATA = [
         { Item: "Laptop", Wattage: 140 },
@@ -1688,4 +1718,5 @@
     </script>
   </body>
 </html>
+
 
